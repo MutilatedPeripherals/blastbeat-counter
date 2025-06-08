@@ -32,27 +32,46 @@ def plot_waveform_and_spectrogram(time, data, ffts, chunk_duration, title):
     plt.savefig(f"./tmp/{title.replace(' ', '_')}.png", dpi=150, bbox_inches="tight")
 
 
-def plot_audio_with_fft_single(
-    time, data, freq, fft_magnitude, title="Audio Signal with FFT"
+def plot_audio_with_fft_range(
+    time: np.ndarray,
+    data: np.ndarray,
+    sample_rate: float,
+    start_time: float,
+    end_time: float,
+    fft_fn: callable = None,
+    title: str = "Audio fragment with FFT",
 ):
+    start_idx = int(start_time * sample_rate)
+    end_idx = int(end_time * sample_rate)
+
+    start_idx = max(0, start_idx)
+    end_idx = min(len(data), end_idx)
+
+    time_range = time[start_idx:end_idx]
+    data_range = data[start_idx:end_idx]
+
+    freq, fft_magnitude = fft_fn(data_range, sample_rate)
+
     nyquist_idx = len(freq) // 2
     freq = freq[:nyquist_idx]
     fft_magnitude = fft_magnitude[:nyquist_idx]
 
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8))
 
-    ax1.plot(time, data, linewidth=1)
+    ax1.plot(time_range, data_range, linewidth=1)
     ax1.set_xlabel("Time (s)")
     ax1.set_ylabel("Amplitude")
+    ax1.set_title(f"Audio Signal ({start_time:.1f}s - {end_time:.1f}s)")
     ax1.grid(True, alpha=0.3)
 
     ax2.plot(freq, fft_magnitude, linewidth=1)
     ax2.set_xlabel("Frequency (Hz)")
     ax2.set_ylabel("Magnitude")
+    ax2.set_xlim(0, 1000)
     ax2.grid(True, alpha=0.3)
 
     fig.suptitle(title, fontsize=14)
     plt.tight_layout()
 
-    filename = f"./tmp/{title.replace(' ', '_')}.png"
+    filename = f"./tmp/{title.replace(' ', '_')}_{start_time:.1f}s-{end_time:.1f}s.png"
     plt.savefig(filename, dpi=150, bbox_inches="tight")

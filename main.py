@@ -4,7 +4,7 @@ import librosa
 import numpy as np
 from numpy.fft import fft
 
-from plotting import plot_waveform_and_spectrogram
+from plotting import plot_audio_with_fft_range, plot_waveform_and_spectrogram
 
 
 def read_audio_file(
@@ -33,6 +33,10 @@ if __name__ == "__main__":
     file_path = "./media/Dying Fetus - Subjected To A Beating.wav"
     # file_path = "./media/Bloody Keep - Omen of the Waxing Moon.wav"
     time, data, sample_rate = read_audio_file(file_path)
+
+    plot_audio_with_fft_range(
+        time, data, sample_rate, 29, 30.9, do_fft, title="Blast beat segment example"
+    )
 
     ffts = []
     chunk_duration = 1
