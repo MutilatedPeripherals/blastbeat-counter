@@ -24,14 +24,12 @@ def plot_audio_with_fft(
     ax1.plot(time, data, linewidth=1)
     ax1.set_xlabel("Time (s)")
     ax1.set_ylabel("Amplitude")
-    ax1.set_title("Audio Signal")
     ax1.grid(True, alpha=0.3)
 
     # Plot FFT magnitude
     ax2.plot(freq, fft_magnitude, linewidth=1)
     ax2.set_xlabel("Frequency (Hz)")
     ax2.set_ylabel("Magnitude")
-    ax2.set_title("FFT Magnitude")
     ax2.grid(True, alpha=0.3)
 
     # Overall title
