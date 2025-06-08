@@ -7,22 +7,14 @@ from numpy.fft import fft
 from plotting import plot_waveform_and_spectrogram
 
 
-def read_audio_file(file_path: str) -> tuple[np.ndarray, np.ndarray, float]:
+def read_audio_file(
+    file_path: str, fade_in_duration=10, fade_out_duration=10
+) -> tuple[np.ndarray, np.ndarray, float]:
     if not os.path.isfile(file_path):
         raise FileNotFoundError(f"The file {file_path} does not exist.")
 
     data, sample_rate = librosa.load(file_path, sr=None, mono=True)
     time = np.arange(len(data)) / sample_rate
-
-    # Trim song end and do a fade out
-    fade_out_duration = 10
-    fade_out_samples = int(fade_out_duration * sample_rate)
-    if fade_out_samples < len(data):
-        data[-fade_out_samples:] *= np.linspace(1, 0, fade_out_samples)
-    else:
-        raise ValueError("The audio file is shorter than the fade out duration.")
-    time = time[:-fade_out_samples]
-    data = data[:-fade_out_samples]
 
     return time, data, sample_rate
 
@@ -39,6 +31,7 @@ def do_fft(x: np.ndarray, sample_rate: float) -> tuple[np.ndarray, np.ndarray]:
 
 if __name__ == "__main__":
     file_path = "./media/Dying Fetus - Subjected To A Beating.wav"
+    # file_path = "./media/Bloody Keep - Omen of the Waxing Moon.wav"
     time, data, sample_rate = read_audio_file(file_path)
 
     ffts = []

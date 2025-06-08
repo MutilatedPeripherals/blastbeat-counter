@@ -27,13 +27,6 @@ def plot_waveform_and_spectrogram(time, data, ffts, chunk_duration, title):
     ax2.set_xlabel("Time (s)")
     ax2.set_ylabel("Frequency (Hz)")
 
-    # example blast beat labels...
-    ax2.axvline(x=29, color="red", linewidth=5, alpha=0.2, label="Blast Beat")
-    ax2.axvline(x=34, color="red", linewidth=5, alpha=0.2)
-    ax2.axvline(x=41, color="red", linewidth=5, alpha=0.2)
-    ax2.axvline(x=47, color="red", linewidth=5, alpha=0.2)
-    ax2.legend()
-
     fig.suptitle(title, fontsize=14)
     plt.tight_layout()
     plt.savefig(f"./tmp/{title.replace(' ', '_')}.png", dpi=150, bbox_inches="tight")
