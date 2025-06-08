@@ -35,7 +35,11 @@ if __name__ == "__main__":
     time, data, sample_rate = read_audio_file(file_path)
 
     plot_audio_with_fft_range(
-        time, data, sample_rate, 29, 30.9, do_fft, title="Blast beat segment example"
+        time, data, sample_rate, 29, 30.9, do_fft, title="Blast-beat segment example"
+    )
+
+    plot_audio_with_fft_range(
+        time, data, sample_rate, 32, 34, do_fft, title="Non blast-beat segment example"
     )
 
     ffts = []
