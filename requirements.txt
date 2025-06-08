@@ -1,5 +1,4 @@
-vispy==0.15.2
 numpy==2.3.0
 scipy==1.15.3
 librosa==0.11.0
-plotly==6.1.2
+matplotlib==3.10.3

@@ -1,6 +1,4 @@
-import plotly.graph_objects as go
-from plotly.offline import plot
-from plotly.subplots import make_subplots
+import matplotlib.pyplot as plt
 
 
 def plot_audio_with_fft(
@@ -20,35 +18,27 @@ def plot_audio_with_fft(
     fft_magnitude = fft_magnitude[:nyquist_idx]
 
     # Create subplots
-    fig = make_subplots(
-        rows=2,
-        cols=1,
-        vertical_spacing=0.1,
-    )
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8))
 
-    fig.add_trace(
-        go.Scatter(
-            x=time, y=data, mode="lines", name="Audio Signal", line=dict(width=1)
-        ),
-        row=1,
-        col=1,
-    )
+    # Plot audio signal
+    ax1.plot(time, data, linewidth=1)
+    ax1.set_xlabel("Time (s)")
+    ax1.set_ylabel("Amplitude")
+    ax1.set_title("Audio Signal")
+    ax1.grid(True, alpha=0.3)
 
-    fig.add_trace(
-        go.Scatter(
-            x=freq,
-            y=fft_magnitude,
-            mode="lines",
-            name="FFT Magnitude",
-            line=dict(width=1),
-        ),
-        row=2,
-        col=1,
-    )
+    # Plot FFT magnitude
+    ax2.plot(freq, fft_magnitude, linewidth=1)
+    ax2.set_xlabel("Frequency (Hz)")
+    ax2.set_ylabel("Magnitude")
+    ax2.set_title("FFT Magnitude")
+    ax2.grid(True, alpha=0.3)
 
-    fig.update_layout(title=title, height=800, showlegend=False)
-    fig.update_xaxes(title_text="Time (s)", row=1, col=1)
-    fig.update_yaxes(title_text="Amplitude", row=1, col=1)
-    fig.update_xaxes(title_text="Frequency (Hz)", row=2, col=1)
-    fig.update_yaxes(title_text="Magnitude", row=2, col=1)
-    plot(fig, filename=f"./tmp/{title.replace(' ', '_')}.html", auto_open=True)
+    # Overall title
+    fig.suptitle(title, fontsize=14)
+    plt.tight_layout()
+
+    # Save and show
+    filename = f"./tmp/{title.replace(' ', '_')}.png"
+    plt.savefig(filename, dpi=150, bbox_inches="tight")
+    plt.show()
