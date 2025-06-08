@@ -14,6 +14,16 @@ def read_audio_file(file_path: str) -> tuple[np.ndarray, np.ndarray, float]:
     data, sample_rate = librosa.load(file_path, sr=None, mono=True)
     time = np.arange(len(data)) / sample_rate
 
+    # Trim song end and do a fade out
+    fade_out_duration = 10
+    fade_out_samples = int(fade_out_duration * sample_rate)
+    if fade_out_samples < len(data):
+        data[-fade_out_samples:] *= np.linspace(1, 0, fade_out_samples)
+    else:
+        raise ValueError("The audio file is shorter than the fade out duration.")
+    time = time[:-fade_out_samples]
+    data = data[:-fade_out_samples]
+
     return time, data, sample_rate
 
 

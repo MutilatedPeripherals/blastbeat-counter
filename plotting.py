@@ -21,7 +21,6 @@ def plot_waveform_and_spectrogram(time, data, ffts, chunk_duration, title):
         aspect="auto",
         origin="lower",
         extent=[time_axis[0], time_axis[-1], freq_axis[0], freq_axis[-1]],
-        # interpolation="nearest",
     )
     ax2.set_ylim(0, 500)
     ax2.set_xticks(np.arange(0, time[-1] + 1, 10))
@@ -41,7 +40,7 @@ def plot_waveform_and_spectrogram(time, data, ffts, chunk_duration, title):
 
 
 def plot_audio_with_fft_single(
-    time, data, sample_rate, freq, fft_magnitude, title="Audio Signal with FFT"
+    time, data, freq, fft_magnitude, title="Audio Signal with FFT"
 ):
     nyquist_idx = len(freq) // 2
     freq = freq[:nyquist_idx]
