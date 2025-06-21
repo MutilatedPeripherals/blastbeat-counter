@@ -27,7 +27,7 @@ def plot_waveform_and_spectrogram(time, data, ffts, chunk_duration, title, outpu
         origin="lower",
         extent=[time_axis[0], time_axis[-1], freq_axis[0], freq_axis[-1]],
     )
-    ax2.set_ylim(0, 500)
+    ax2.set_ylim(0, 400)
     ax2.set_xticks(np.arange(0, time[-1] + 1, 10))
     ax2.set_xlabel("Time (s)")
     ax2.set_ylabel("Frequency (Hz)")
@@ -73,7 +73,7 @@ def plot_audio_with_fft_range(
     ax2.plot(freq, fft_magnitude, linewidth=1)
     ax2.set_xlabel("Frequency (Hz)")
     ax2.set_ylabel("Magnitude")
-    ax2.set_xlim(0, 1000)
+    ax2.set_xlim(0, 400)
     ax2.grid(True, alpha=0.3)
 
     fig.suptitle(title, fontsize=14)
