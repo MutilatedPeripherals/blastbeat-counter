@@ -2,3 +2,7 @@
 input/
 separated/
 venv
+*.wav
+*.mp3
+*.pkl
+experiments/output/

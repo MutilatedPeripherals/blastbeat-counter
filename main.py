@@ -9,7 +9,7 @@ from numpy.fft import fft
 from plotting import plot_audio_with_fft_range, plot_waveform_and_spectrogram
 
 base_dir = Path(__file__).parent.resolve()
-default_output_dir = f"{base_dir}/output/main_pipeline"
+default_output_dir = f"{base_dir}/output"
 
 
 def extract_drums(input_file_path: Path) -> tuple[np.ndarray, np.ndarray, float]:

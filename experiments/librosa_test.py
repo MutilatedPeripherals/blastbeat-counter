@@ -56,7 +56,7 @@ def plot_spectrogram(y: np.ndarray, sample_rate: int, start: float, end: float, 
 
 if __name__ == "__main__":
     base_dir = Path(__file__).parent.resolve()
-    file_path = f"{base_dir}/input/Dying Fetus - Subjected To A Beating.wav"
+    file_path = f"{base_dir.parent}/input/Dying Fetus - Subjected To A Beating.wav"
 
     if not os.path.isfile(default_output_dir):
         os.makedirs(default_output_dir, exist_ok=True)

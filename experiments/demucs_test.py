@@ -43,7 +43,7 @@ if __name__ == "__main__":
     if not os.path.isfile(default_output_dir):
         os.makedirs(default_output_dir, exist_ok=True)
 
-    input_file_path = Path(f"{base_dir}/input/Dying Fetus - Subjected To A Beating.wav")
+    input_file_path = Path(f"{base_dir.parent}/input/Dying Fetus - Subjected To A Beating.wav")
     isolated_drums_file_path = (
         input_file_path.parent / "htdemucs" / f"{input_file_path.stem}/drums.wav"
     )
