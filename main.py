@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 import librosa
 import numpy as np
@@ -7,11 +7,9 @@ from numpy.fft import fft
 from plotting import plot_audio_with_fft_range, plot_waveform_and_spectrogram
 
 
-def read_audio_file(
-    file_path: str, fade_in_duration=10, fade_out_duration=10
-) -> tuple[np.ndarray, np.ndarray, float]:
-    if not os.path.isfile(file_path):
-        raise FileNotFoundError(f"The file {file_path} does not exist.")
+def read_audio_file(file_path: Path) -> tuple[np.ndarray, np.ndarray, float]:
+    if not file_path.exists():
+        raise FileNotFoundError(f"The file {file_path.as_posix()} does not exist.")
 
     data, sample_rate = librosa.load(file_path, sr=None, mono=True)
     time = np.arange(len(data)) / sample_rate
@@ -30,16 +28,19 @@ def do_fft(x: np.ndarray, sample_rate: float) -> tuple[np.ndarray, np.ndarray]:
 
 
 if __name__ == "__main__":
-    file_path = "./media/Dying Fetus - Subjected To A Beating.wav"
-    # file_path = "./media/Bloody Keep - Omen of the Waxing Moon.wav"
+    #file_path = "./input/Dying Fetus - Subjected To A Beating.wav"
+    file_path = Path("./input/htdemucs/Dying Fetus - Subjected To A Beating/drums.wav")
+
+    song_name = file_path.parent.stem if file_path.stem == "drums" else file_path.stem
+
     time, data, sample_rate = read_audio_file(file_path)
 
     plot_audio_with_fft_range(
-        time, data, sample_rate, 29, 30.9, do_fft, title="Blast-beat segment example"
+        time, data, sample_rate, 29, 30.9, do_fft, title=f"{song_name} | Blast-beat segment example"
     )
 
     plot_audio_with_fft_range(
-        time, data, sample_rate, 32, 34, do_fft, title="Non blast-beat segment example"
+        time, data, sample_rate, 32, 34, do_fft, title=f"{song_name} | Non blast-beat segment example"
     )
 
     ffts = []
@@ -61,5 +62,5 @@ if __name__ == "__main__":
         ffts.append((freq, fft_values))
 
     plot_waveform_and_spectrogram(
-        time, data, ffts, chunk_duration, title=file_path.replace("./media/", "")
+        time, data, ffts, chunk_duration, title=song_name
     )

@@ -1,8 +1,13 @@
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import numpy as np
 
+base_dir = Path(__file__).parent.resolve()
+default_output_dir = f"{base_dir}/output"
 
-def plot_waveform_and_spectrogram(time, data, ffts, chunk_duration, title):
+
+def plot_waveform_and_spectrogram(time, data, ffts, chunk_duration, title, output_dir=default_output_dir):
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8))
 
     ax1.plot(time, data, linewidth=1)
@@ -29,7 +34,7 @@ def plot_waveform_and_spectrogram(time, data, ffts, chunk_duration, title):
 
     fig.suptitle(title, fontsize=14)
     plt.tight_layout()
-    plt.savefig(f"./tmp/{title.replace(' ', '_')}.png", dpi=150, bbox_inches="tight")
+    plt.savefig(f"{output_dir}/{title}.png", dpi=150, bbox_inches="tight")
 
 
 def plot_audio_with_fft_range(
@@ -40,6 +45,7 @@ def plot_audio_with_fft_range(
     end_time: float,
     fft_fn: callable = None,
     title: str = "Audio fragment with FFT",
+    output_dir=default_output_dir
 ):
     start_idx = int(start_time * sample_rate)
     end_idx = int(end_time * sample_rate)
@@ -73,5 +79,5 @@ def plot_audio_with_fft_range(
     fig.suptitle(title, fontsize=14)
     plt.tight_layout()
 
-    filename = f"./tmp/{title.replace(' ', '_')}_{start_time:.1f}s-{end_time:.1f}s.png"
+    filename = f"{output_dir}/{title}_{start_time:.1f}s-{end_time:.1f}s.png"
     plt.savefig(filename, dpi=150, bbox_inches="tight")

@@ -1,4 +1,5 @@
 .idea
-media/
-tmp/
+input/
+output/
 separated/
+venv

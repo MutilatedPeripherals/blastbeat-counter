@@ -2,3 +2,4 @@ numpy==2.3.0
 scipy==1.15.3
 librosa==0.11.0
 matplotlib==3.10.3
+demucs==4.0.1
