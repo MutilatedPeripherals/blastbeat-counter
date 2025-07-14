@@ -58,10 +58,6 @@ def plot_audio_with_fft_range(
 
     freq, fft_magnitude = fft_fn(data_range, sample_rate)
 
-    nyquist_idx = len(freq) // 2
-    freq = freq[:nyquist_idx]
-    fft_magnitude = fft_magnitude[:nyquist_idx]
-
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8))
 
     ax1.plot(time_range, data_range, linewidth=1)
@@ -81,3 +77,5 @@ def plot_audio_with_fft_range(
 
     filename = f"{output_dir}/{title}_{start_time:.1f}s-{end_time:.1f}s.png"
     plt.savefig(filename, dpi=150, bbox_inches="tight")
+
+    return freq, fft_magnitude 
