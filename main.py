@@ -1,38 +1,13 @@
-import os
 from pathlib import Path
 
-import demucs.separate
-import librosa
 import numpy as np
 from numpy.fft import fft
 
+from extraction import extract_drums
 from plotting import plot_audio_with_fft_range, plot_waveform_and_spectrogram
 
 base_dir = Path(__file__).parent.resolve()
 default_output_dir = f"{base_dir}/output"
-
-
-def extract_drums(input_file_path: Path) -> tuple[np.ndarray, np.ndarray, float]:
-    if not input_file_path.exists():
-        raise FileNotFoundError(f"The input file {input_file_path.as_posix()} does not exist.")
-
-    if not os.path.isfile(default_output_dir):
-        os.makedirs(default_output_dir, exist_ok=True)
-
-    isolated_drums_file_path = (
-            input_file_path.parent / "htdemucs" / f"{input_file_path.stem}/drums.wav"
-    )
-
-    if not isolated_drums_file_path.exists():
-        print("Isolating drums with Demucs...")
-        demucs.separate.main(
-            ["--two-stems", "drums", "--device", "cuda", "-o", "input", input_file_path.as_posix()]
-        )
-
-    y, sample_rate = librosa.load(isolated_drums_file_path, mono=True)
-    time = np.arange(len(y)) / sample_rate
-
-    return time, y.astype(np.float32), sample_rate
 
 
 def do_fft(x: np.ndarray, sample_rate: float) -> tuple[np.ndarray, np.ndarray]:
