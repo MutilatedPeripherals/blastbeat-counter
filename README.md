@@ -8,9 +8,10 @@
 
 ## Plan
 
-- Identify frequencies of snare & bass drum (hihat for next iteration)
-    - snare: 300hz
-    - bass drum: 60hz
-- Process the waveform (0.5s segments) and determine: 1) does it contain snare, 2) does it contain bass drum
-- If at least 4 consecutive segments contain snare and bass drum, count it as a blast beat
-- Plot the waveform (and spectrogram) with the blast beat segments highlighted
+[X] Identify frequencies of snare & bass drum (hihat for next iteration)
+
+- snare: 300hz
+- bass drum: 60hz
+  [X] Process the waveform (0.5s segments) and determine: 1) does it contain snare, 2) does it contain bass drum
+- [] If at least 4 consecutive segments contain snare and bass drum, count it as a blast beat
+- [] Plot the waveform (and spectrogram) with the blast beat segments highlighted
