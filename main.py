@@ -6,9 +6,6 @@ from numpy.fft import fft
 from extraction import extract_drums
 from plotting import plot_audio_with_fft_range, plot_waveform_and_spectrogram
 
-base_dir = Path(__file__).parent.resolve()
-default_output_dir = f"{base_dir}/output"
-
 
 def do_fft(x: np.ndarray, sample_rate: float) -> tuple[np.ndarray, np.ndarray]:
     X = fft(x)
@@ -21,7 +18,10 @@ def do_fft(x: np.ndarray, sample_rate: float) -> tuple[np.ndarray, np.ndarray]:
 
 
 if __name__ == "__main__":
-    file_path = Path(f"{base_dir}/input/Dying Fetus - Subjected To A Beating.wav")
+    base_dir = "/home/linomp/Downloads"
+    default_output_dir = f"./output"
+
+    file_path = Path(f"{base_dir}/Dying Fetus - Subjected To A Beating.wav")
     time, data, sample_rate = extract_drums(file_path)
 
     print("Generating spectrograms...")

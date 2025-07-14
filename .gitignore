@@ -6,3 +6,4 @@ venv
 *.mp3
 *.pkl
 experiments/output/
+output/

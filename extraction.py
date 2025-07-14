@@ -18,7 +18,7 @@ def extract_drums(input_file_path: Path) -> tuple[np.ndarray, np.ndarray, float]
         )
         print("Isolating drums with Demucs...")
         demucs.separate.main(
-            ["--two-stems", "drums", "--device", "cuda", "-o", "input", input_file_path.as_posix()]
+            ["--two-stems", "drums", "--device", "cuda", "-o", f"{input_file_path.parent}", input_file_path.as_posix()]
         )
         shutil.copy(temp_file_path, extracted_drums_file_path)
         shutil.rmtree(temp_file_path.parent)
@@ -30,7 +30,7 @@ def extract_drums(input_file_path: Path) -> tuple[np.ndarray, np.ndarray, float]
 
 
 if __name__ == "__main__":
-    base_dir = Path(__file__).parent.resolve()
+    base_dir = "/home/linomp/Downloads"
 
-    file_path = Path(f"{base_dir}/input/Eloy Casagrande - Manipulation of Tragedy Sepultura - Live Session.mp3")
+    file_path = Path(f"{base_dir}/Dying Fetus - Subjected To A Beating.wav")
     extract_drums(file_path)
