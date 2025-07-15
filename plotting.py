@@ -105,6 +105,8 @@ def plot_waveform(time: np.ndarray, data:np.ndarray, ranges_to_highlight:list[tu
     fig, ax1 = plt.subplots(1, 1, figsize=(12, 8))
     ax1.plot(non_highlighted_time_elements, non_highlighted_data_elements, linewidth=1, color='blue')
     ax1.plot(highlighted_time_elements, highlighted_data_elements, linewidth=1, color='red')
+    ax1.set_xticks(np.arange(0, time[-1] + 1, 10))
+    ax1.grid(True, alpha=0.3)
 
     fig.suptitle(title, fontsize=14)
     plt.tight_layout()

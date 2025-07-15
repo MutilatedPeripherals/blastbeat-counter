@@ -45,7 +45,7 @@ def contains_snare_or_bass_drum(freq: np.ndarray, fft_magnitude: np.ndarray, bas
 def analyze_song(time, data, sample_rate)-> list[tuple[tuple[int, int], bool, bool]]:
     results = []
 
-    step_size_in_seconds = 0.1
+    step_size_in_seconds = 0.04 # most important magical constant of the whole project.
     step_size_in_samples = int(step_size_in_seconds * sample_rate)
 
     for start_idx in range(0, len(time), step_size_in_samples):
@@ -58,8 +58,9 @@ def analyze_song(time, data, sample_rate)-> list[tuple[tuple[int, int], bool, bo
 
     return results
 
-def identify_blasts(sections: list[tuple[float, bool, bool]]) -> list[tuple[int,int]]:
-    pass
+def identify_blasts(sections: list[tuple[tuple[int, int], bool, bool]]) -> list[tuple[int,int]]:
+    # braindead approach: if a section contains both snare and bass drum, it is a blast beat
+    return [section[0] for section in sections if section[1] and section[2]]
 
 if __name__ == "__main__":
     base_dir = "/home/linomp/Downloads"
@@ -68,9 +69,6 @@ if __name__ == "__main__":
     file_path = Path(f"{base_dir}/Dying Fetus - Subjected To A Beating.wav")
     time, data, sample_rate = extract_drums(file_path)
 
-    results = analyze_song(time, data, sample_rate)
-    for idx, snare, bass in results:
-        print(f"({idx}) - Snare: {snare}, Bass: {bass}")
-
-    blast_ranges = [(int(1e6), int(3e6)), (int(4e6), int(5e6))]
+    sections = analyze_song(time, data, sample_rate)
+    blast_ranges = identify_blasts(sections)
     plot_waveform(time, data, blast_ranges, title=file_path.stem)
