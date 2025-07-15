@@ -87,4 +87,4 @@ if __name__ == "__main__":
     for i, (snare, bass) in enumerate(results):
         print(f"Time {i * 0.1:.1f}s - Snare: {snare}, Bass: {bass}")
 
-    plot_waveform(time, data, sample_rate, title=file_path.stem)
+    plot_waveform(time, data, [(int(1e6), int(3e6)), (int(4e6), int(5e6))], title=file_path.stem)

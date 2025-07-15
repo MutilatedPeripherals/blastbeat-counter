@@ -81,20 +81,30 @@ def plot_audio_with_fft_range(
     return freq, fft_magnitude
 
 
-def plot_waveform(time: np.ndarray, data:np.ndarray, sample_rate:float, title:str="test", output_dir=default_output_dir):
-    first_blue_idx = range(0, int(1e6), 1)
-    red_idx = range(int(1e6), int(3e6), 1)
-    second_blue_idx = range(int(3e6), len(time), 1)
+def plot_waveform(time: np.ndarray, data:np.ndarray, ranges_to_highlight:list[tuple[int, int]], title:str="test", output_dir=default_output_dir):
+    highlighted_time_elements = []
+    highlighted_data_elements = []
+    non_highlighted_time_elements = []
+    non_highlighted_data_elements = []
+
+    curr_idx = 0
+
+    for start, end in ranges_to_highlight:
+        non_highlighted_time_elements.extend(time[curr_idx:start])
+        non_highlighted_data_elements.extend(data[curr_idx:start])
+
+        highlighted_time_elements.extend(time[start:end])
+        highlighted_data_elements.extend(data[start:end])
+
+        curr_idx = end
+
+    if curr_idx < len(time):
+        non_highlighted_time_elements.extend(time[curr_idx:])
+        non_highlighted_data_elements.extend(data[curr_idx:])
 
     fig, ax1 = plt.subplots(1, 1, figsize=(12, 8))
-
-    ax1.plot(time[first_blue_idx], data[first_blue_idx], linewidth=1, color='blue')
-    ax1.plot(time[red_idx], data[red_idx], linewidth=1, color='red')
-    ax1.plot(time[second_blue_idx], data[second_blue_idx], linewidth=1, color='blue')
-
-    ax1.set_xlabel("Time (s)")
-    ax1.set_ylabel("Amplitude")
-    ax1.grid(True, alpha=0.3)
+    ax1.plot(non_highlighted_time_elements, non_highlighted_data_elements, linewidth=1, color='blue')
+    ax1.plot(highlighted_time_elements, highlighted_data_elements, linewidth=1, color='red')
 
     fig.suptitle(title, fontsize=14)
     plt.tight_layout()
