@@ -45,7 +45,7 @@ def contains_snare_or_bass_drum(freq: np.ndarray, fft_magnitude: np.ndarray, bas
 def analyze_song(time, data, sample_rate)-> list[tuple[tuple[int, int], bool, bool]]:
     results = []
 
-    step_size_in_seconds = 0.04 # most important magical constant of the whole project.
+    step_size_in_seconds = 0.1 # most important magical constant of the whole project.
     step_size_in_samples = int(step_size_in_seconds * sample_rate)
 
     for start_idx in range(0, len(time), step_size_in_samples):
