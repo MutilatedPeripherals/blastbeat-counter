@@ -4,6 +4,7 @@ import numpy as np
 from numpy.fft import fft
 
 from extraction import extract_drums
+from plotting import plot_waveform
 
 
 def do_fft(x: np.ndarray, sample_rate: float) -> tuple[np.ndarray, np.ndarray]:
@@ -63,6 +64,9 @@ def analyze_song(time, data, sample_rate)-> list[tuple[float, bool, bool]]:
 
     return results
 
+def identify_blasts(sections: list[tuple[float, bool, bool]]) -> list[tuple[float,float]]:
+    pass
+
 if __name__ == "__main__":
     base_dir = "/home/linomp/Downloads"
     default_output_dir = f"./output"
@@ -79,7 +83,8 @@ if __name__ == "__main__":
     # snare_present, bass_drum_present = contains_snare_or_bass_drum(freq, fft_magnitude)
     # print(f"Snare present: {snare_present}, Bass drum present: {bass_drum_present}")
 
-
     results = analyze_song(time, data, sample_rate)
     for i, (snare, bass) in enumerate(results):
         print(f"Time {i * 0.1:.1f}s - Snare: {snare}, Bass: {bass}")
+
+    plot_waveform(time, data, sample_rate, title=file_path.stem)
