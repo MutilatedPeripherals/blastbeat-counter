@@ -59,8 +59,29 @@ def analyze_song(time, data, sample_rate)-> list[tuple[tuple[int, int], bool, bo
     return results
 
 def identify_blasts(sections: list[tuple[tuple[int, int], bool, bool]]) -> list[tuple[int,int]]:
+    # section[1]: snare present?
+    # section[2]: bass drum present?
     # braindead approach: if a section contains both snare and bass drum, it is a blast beat
-    return [section[0] for section in sections if section[1] and section[2]]
+    # return [section[0] for section in sections if section[1] and section[2]]
+
+    # primitive:  4 snares+bass in a series at least
+    threshold=4
+    begin_idx=0
+    count=0
+    results = []
+    for i in range(0, len(sections)):
+        current_section = sections[i]
+        if current_section[1] and current_section[2]:
+            if count == 0:
+                begin_idx = i
+            count = count+1
+        else:
+            if count >= threshold:
+                start = sections[begin_idx][0][0]
+                results.append((start, current_section[0][0]))
+            count = 0
+
+    return results
 
 if __name__ == "__main__":
     base_dir = "/home/linomp/Downloads"
