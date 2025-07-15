@@ -42,29 +42,23 @@ def contains_snare_or_bass_drum(freq: np.ndarray, fft_magnitude: np.ndarray, bas
 
     return snare_present, bass_drum_present
 
-def analyze_song(time, data, sample_rate)-> list[tuple[float, bool, bool]]:
+def analyze_song(time, data, sample_rate)-> list[tuple[tuple[int, int], bool, bool]]:
     results = []
 
-    for start_time in np.arange(0, time[-1], 0.1):
-        end_time = start_time + 0.1
-        if end_time > time[-1]:
-            break
+    step_size_in_seconds = 0.1
+    step_size_in_samples = int(step_size_in_seconds * sample_rate)
 
-        start_idx = int(start_time * sample_rate)
-        end_idx = int(end_time * sample_rate)
-
-        start_idx = max(0, start_idx)
-        end_idx = min(len(data), end_idx)
-
+    for start_idx in range(0, len(time), step_size_in_samples):
+        end_idx = start_idx + step_size_in_samples
         data_range = data[start_idx:end_idx]
 
         freq, fft_magnitude = do_fft(data_range, sample_rate)
-        result = contains_snare_or_bass_drum(freq, fft_magnitude)
-        results.append(result)
+        snare_present, bass_drum_present = contains_snare_or_bass_drum(freq, fft_magnitude)
+        results.append(((start_idx, end_idx), snare_present, bass_drum_present))
 
     return results
 
-def identify_blasts(sections: list[tuple[float, bool, bool]]) -> list[tuple[float,float]]:
+def identify_blasts(sections: list[tuple[float, bool, bool]]) -> list[tuple[int,int]]:
     pass
 
 if __name__ == "__main__":
@@ -74,17 +68,9 @@ if __name__ == "__main__":
     file_path = Path(f"{base_dir}/Dying Fetus - Subjected To A Beating.wav")
     time, data, sample_rate = extract_drums(file_path)
 
-    # song_name = file_path.stem
-    # freq, fft_magnitude  = plot_audio_with_fft_range(
-    #     time, data, sample_rate, 29, 29.1, do_fft, title=f"{song_name} | Bass drum isolation example",
-    #     output_dir=default_output_dir
-    # )
-    #
-    # snare_present, bass_drum_present = contains_snare_or_bass_drum(freq, fft_magnitude)
-    # print(f"Snare present: {snare_present}, Bass drum present: {bass_drum_present}")
-
     results = analyze_song(time, data, sample_rate)
-    for i, (snare, bass) in enumerate(results):
-        print(f"Time {i * 0.1:.1f}s - Snare: {snare}, Bass: {bass}")
+    for idx, snare, bass in results:
+        print(f"({idx}) - Snare: {snare}, Bass: {bass}")
 
-    plot_waveform(time, data, [(int(1e6), int(3e6)), (int(4e6), int(5e6))], title=file_path.stem)
+    blast_ranges = [(int(1e6), int(3e6)), (int(4e6), int(5e6))]
+    plot_waveform(time, data, blast_ranges, title=file_path.stem)
