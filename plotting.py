@@ -34,7 +34,7 @@ def plot_waveform_and_spectrogram(time, data, ffts, chunk_duration, title, outpu
 
     fig.suptitle(title, fontsize=14)
     plt.tight_layout()
-    plt.savefig(f"{output_dir}/{title}.png", dpi=150, bbox_inches="tight")
+    plt.savefig(f"{output_dir}/{title.replace(" ", "_").replace("-","_")}.png", dpi=150, bbox_inches="tight")
 
 
 def plot_audio_with_fft_range(
@@ -75,7 +75,7 @@ def plot_audio_with_fft_range(
     fig.suptitle(title, fontsize=14)
     plt.tight_layout()
 
-    filename = f"{output_dir}/{title}_{start_time:.1f}s-{end_time:.1f}s.png"
+    filename = f"{output_dir}/{title.replace(" ", "_").replace("-","_")}_{start_time:.1f}s_{end_time:.1f}s.png"
     plt.savefig(filename, dpi=150, bbox_inches="tight")
 
     return freq, fft_magnitude
@@ -103,11 +103,11 @@ def plot_waveform(time: np.ndarray, data:np.ndarray, ranges_to_highlight:list[tu
         non_highlighted_data_elements.extend(data[curr_idx:])
 
     fig, ax1 = plt.subplots(1, 1, figsize=(12, 8))
-    ax1.plot(non_highlighted_time_elements, non_highlighted_data_elements, linewidth=1, color='blue')
-    ax1.plot(highlighted_time_elements, highlighted_data_elements, linewidth=1, color='red')
+    ax1.scatter(non_highlighted_time_elements, non_highlighted_data_elements, color='blue', marker='o', label='Non-highlighted', s=0.01)
+    ax1.scatter(highlighted_time_elements, highlighted_data_elements, color='red', marker='o', label='Highlighted', s=0.01)
     ax1.set_xticks(np.arange(0, time[-1] + 1, 10))
     ax1.grid(True, alpha=0.3)
 
     fig.suptitle(title, fontsize=14)
     plt.tight_layout()
-    plt.savefig(f"{output_dir}/{title}.png", dpi=150, bbox_inches="tight")
+    plt.savefig(f"{output_dir}/{title.replace(" ", "_").replace("-","_")}.png", dpi=150, bbox_inches="tight")
