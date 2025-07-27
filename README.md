@@ -12,7 +12,7 @@ As metal maniacs and programmers, we naturally asked ourselves:
 **_Can we identify blast beats programmatically?_**
 
 ## Experiments
-We took one of the cleanest blast-examples available, in terms of production & execution (_Dying Fetus - Subjected to a Beating_), and after isolating the drums and analyzing the spectrogram, we observed a very clear pattern, with the **bass drum** hits hovering around **60Hz** and the **snare** around around **300Hz**. 
+We took one of the cleanest blast-beat examples available, in terms of production & execution (_Dying Fetus - Subjected to a Beating_), and after isolating the drums and analyzing the spectrogram, we observed a very clear pattern, with the **bass drum** hits hovering around **60Hz** and the **snare** around around **300Hz**. 
 
 Here we highlighted the first blast beat of this song, between 29s - 31s:
 
