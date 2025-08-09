@@ -1,39 +1,38 @@
-from main import idenfity_blastbeat_intervals
+from main import LabeledSection, identify_blastbeat_intervals
 
 
 def test_identify_blasts_1():
-    input: list[tuple[tuple[int, int], bool, bool]] = [
-        ((1,2), False,True),
-        ((2,3), True,True),
-        ((3,4), True,True),
-        ((4,5), True,True),
-        ((5,6), True,True),
-        ((6,7), True,False),
-        ((7,8), True,False),
+    input: list[LabeledSection] = [
+        LabeledSection((1,2), False, True),
+        LabeledSection((2,3), True, True),
+        LabeledSection((3,4), True, True),
+        LabeledSection((4,5), True, True),
+        LabeledSection((5,6), True, True),
+        LabeledSection((6,7), True, False),
+        LabeledSection((7,8), True, False),
     ]
 
     expected = [(2,6)]
 
-    actual = idenfity_blastbeat_intervals(input)
+    actual = identify_blastbeat_intervals(input)
 
-    assert actual==expected
-
+    assert actual == expected
 
 
 def test_identify_blasts_2():
-    input: list[tuple[tuple[int, int], bool, bool]] = [
-        ((1,2), False,True),
-        ((2,3), True,True),
-        ((3,4), True,True),
-        ((4,5), True,False),
-        ((5,6), True,True),
-        ((6,7), True,True),
-        ((7,8), True,True),
-        ((8,9), True,False),
+    input: list[LabeledSection] = [
+        LabeledSection((1,2), False, True),
+        LabeledSection((2,3), True, True),
+        LabeledSection((3,4), True, True),
+        LabeledSection((4,5), True, False),
+        LabeledSection((5,6), True, True),
+        LabeledSection((6,7), True, True),
+        LabeledSection((7,8), True, True),
+        LabeledSection((8,9), True, False),
     ]
 
     expected = []
 
-    actual = idenfity_blastbeat_intervals(input)
+    actual = identify_blastbeat_intervals(input)
 
-    assert actual==expected
+    assert actual == expected
