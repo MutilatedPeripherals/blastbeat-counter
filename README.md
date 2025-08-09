@@ -25,7 +25,7 @@ Here is what we are currently detecting with the MVP (blast beats in red):
 
 ## MVP Roadmap
 
-- [X] Identify frequencies of snare & bass drum (hihat left for next iteration); hardcodes for now
+- [X] Identify frequencies of snare & bass drum (hihat left for next iteration); hardcoded for now
     - snare: 300hz
     - bass drum: 50hz
 - [X] Process the waveform (0.5s segments) and determine: 1) does it contain snare, 2) does it contain bass drum
