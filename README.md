@@ -25,10 +25,10 @@ Here is what we are currently detecting with the MVP (blast beats in red):
 
 ## MVP Roadmap
 
-- [X] Identify frequencies of snare & bass drum (hihat left for next iteration)
+- [X] Identify frequencies of snare & bass drum (hihat left for next iteration); hardcodes for now
     - snare: 300hz
     - bass drum: 50hz
 - [X] Process the waveform (0.5s segments) and determine: 1) does it contain snare, 2) does it contain bass drum
 - [X] If at least 4 consecutive segments contain snare + bass drum, count it as a blast beat
 - [X] Plot the waveform with the blast beat segments highlighted
-- [ ] Test with other types of blast beats
+- [ ] Dynamically identify/estimate snare & bass frequencies & test with a few different songs & drum tuning ranges
