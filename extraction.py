@@ -6,6 +6,13 @@ import librosa
 import numpy as np
 
 
+def read_audio_file(input_file_path: Path) -> tuple[np.ndarray, np.ndarray, float]:
+    y, sample_rate = librosa.load(input_file_path, mono=True)
+    time = np.arange(len(y)) / sample_rate
+
+    return time, y.astype(np.float32), sample_rate
+
+
 def extract_drums(input_file_path: Path) -> tuple[np.ndarray, np.ndarray, float]:
     if not input_file_path.exists():
         raise FileNotFoundError(f"The input file {input_file_path.as_posix()} does not exist.")
@@ -23,10 +30,7 @@ def extract_drums(input_file_path: Path) -> tuple[np.ndarray, np.ndarray, float]
         shutil.copy(temp_file_path, extracted_drums_file_path)
         shutil.rmtree(temp_file_path.parent)
 
-    y, sample_rate = librosa.load(extracted_drums_file_path, mono=True)
-    time = np.arange(len(y)) / sample_rate
-
-    return time, y.astype(np.float32), sample_rate
+    return read_audio_file(extracted_drums_file_path)
 
 
 if __name__ == "__main__":

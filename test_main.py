@@ -1,4 +1,4 @@
-from main import identify_blasts
+from main import idenfity_blastbeat_intervals
 
 
 def test_identify_blasts_1():
@@ -14,7 +14,7 @@ def test_identify_blasts_1():
 
     expected = [(2,6)]
 
-    actual = identify_blasts(input)
+    actual = idenfity_blastbeat_intervals(input)
 
     assert actual==expected
 
@@ -34,6 +34,6 @@ def test_identify_blasts_2():
 
     expected = []
 
-    actual = identify_blasts(input)
+    actual = idenfity_blastbeat_intervals(input)
 
     assert actual==expected
