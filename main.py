@@ -119,8 +119,9 @@ if __name__ == "__main__":
     base_dir = "/home/linomp/Downloads"
     default_output_dir = f"./output"
 
-    # file = "CURETAJE - Arutam.mp3"
-    file = "Dying Fetus - Subjected To A Beating.wav"
+    file = "CURETAJE - Arutam.mp3"
+    # file = "Dying Fetus - Subjected To A Beating.wav"
+    # file = "SUFFOCATION - Perpetual Deception.mp3"
 
     file_path = Path(base_dir) / file
     time, audio_data, sample_rate = extract_drums(file_path)

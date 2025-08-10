@@ -105,9 +105,11 @@ def plot_waveform(time: np.ndarray, data:np.ndarray, ranges_to_highlight:list[tu
     fig, ax1 = plt.subplots(1, 1, figsize=(12, 8))
     ax1.scatter(non_highlighted_time_elements, non_highlighted_data_elements, color='blue', marker='o', label='Other', s=0.01)
     ax1.scatter(highlighted_time_elements, highlighted_data_elements, color='red', marker='o', label='Blast-beats', s=0.01)
-    ax1.set_xticks(np.arange(0, time[-1] + 1, 10))
+    ax1.set_xticks(np.arange(0, time[-1] + 1, 15))
+    ax1.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f"{int(x // 60)}:{int(x % 60):02d}"))
+    ax1.set_xlim(time[0], time[-1])
     ax1.grid(True, alpha=0.3)
-    ax1.set_xlabel("Time (s)")
+    ax1.set_xlabel("Time")
     ax1.set_ylabel("Amplitude")
 
     fig.suptitle(title, fontsize=14)
