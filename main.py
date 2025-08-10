@@ -85,18 +85,47 @@ def identify_blastbeat_intervals(sections: list[LabeledSection]) -> list[tuple[i
 
     return results
 
+def identify_bass_and_snare_frequencies(audio_data: np.ndarray, sample_rate: float) -> tuple[float, float]:
+    # simple approach: fft over the whole song
+    freq, intensities = get_frequency_and_intensity_arrays(audio_data, sample_rate)
+
+    # define ranges to look for
+    bass_drum_range = (10, 100)
+    snare_range = (170, 600)
+
+    # find the peak in the bass drum range
+    bass_drum_idx = np.where((freq >= bass_drum_range[0]) & (freq <= bass_drum_range[1]))[0]
+    snare_idx = np.where((freq >= snare_range[0]) & (freq <= snare_range[1]))[0]
+
+    bass_drum_freq, snare_freq = None, None
+
+    if bass_drum_idx.size > 0:
+        bass_drum_freq = freq[bass_drum_idx[np.argmax(intensities[bass_drum_idx])]]
+    else:
+        print("Warning: No bass drum frequency found in the specified range.")
+
+    if snare_idx.size > 0:
+        snare_freq = freq[snare_idx[np.argmax(intensities[snare_idx])]]
+    else:
+        print("Warning: No snare frequency found in the specified range.")
+
+    if bass_drum_freq is None or snare_freq is None:
+        raise ValueError("Could not identify bass drum or snare frequencies. Please check the audio file.")
+
+    return bass_drum_freq, snare_freq
+
 
 if __name__ == "__main__":
     base_dir = "/home/linomp/Downloads"
     default_output_dir = f"./output"
 
-    bass_drum_freq, snare_freq, file = 40.0, 230.0, "CURETAJE - Arutam.mp3"
-    #bass_drum_freq, snare_freq, file = 30.0, 300.0, "Dying Fetus - Subjected To A Beating.wav"
+    # file = "CURETAJE - Arutam.mp3"
+    file = "Dying Fetus - Subjected To A Beating.wav"
 
     file_path = Path(base_dir) / file
-
     time, audio_data, sample_rate = extract_drums(file_path)
-    # TODO: dynamically identify snare_freq, bass_drum_freq
+    bass_drum_freq, snare_freq = identify_bass_and_snare_frequencies(audio_data, sample_rate)
+    print(f"Identified bass drum frequency: {bass_drum_freq} Hz, snare frequency: {snare_freq} Hz")
 
     labeled_sections = get_sections_labeled_by_percussion_content_from_audio(time, audio_data, sample_rate, bass_drum_freq, snare_freq)
     blastbeat_intervals = identify_blastbeat_intervals(labeled_sections)
