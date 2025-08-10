@@ -9,7 +9,8 @@ from plotting import plot_waveform
 
 
 class LabeledSection(NamedTuple):
-    time_range: tuple[int, int]
+    start_idx: int
+    end_idx: int
     snare_present: bool
     bass_drum_present: bool
 
@@ -58,7 +59,7 @@ def get_sections_labeled_by_percussion_content_from_audio(time, data, sample_rat
         snare_present = is_peak_present_around_frequency(snare_drum_freq, freq, fft_magnitude)
         bass_drum_present = is_peak_present_around_frequency(bass_drum_freq, freq, fft_magnitude)
 
-        results.append(LabeledSection((start_idx, end_idx), snare_present, bass_drum_present))
+        results.append(LabeledSection(start_idx, end_idx, snare_present, bass_drum_present))
 
     return results
 
@@ -77,8 +78,8 @@ def identify_blastbeat_intervals(sections: list[LabeledSection]) -> list[tuple[i
             hits_count += 1
         else:
             if hits_count >= min_hits_threshold:
-                blastbeat_start = sections[blastbeat_start_idx].time_range[0]
-                blastbeat_end = sections[i].time_range[0]
+                blastbeat_start = sections[blastbeat_start_idx].start_idx
+                blastbeat_end = sections[i].end_idx
                 results.append((blastbeat_start, blastbeat_end))
             hits_count = 0
 
@@ -89,7 +90,7 @@ if __name__ == "__main__":
     base_dir = "/home/linomp/Downloads"
     default_output_dir = f"./output"
 
-    bass_drum_freq, snare_freq, file = 40.0, 200.0, "CURETAJE - Arutam.mp3"
+    bass_drum_freq, snare_freq, file = 40.0, 230.0, "CURETAJE - Arutam.mp3"
     #bass_drum_freq, snare_freq, file = 30.0, 300.0, "Dying Fetus - Subjected To A Beating.wav"
 
     file_path = Path(base_dir) / file
