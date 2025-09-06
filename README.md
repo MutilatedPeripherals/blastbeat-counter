@@ -27,8 +27,15 @@ Here we highlighted the first blast beat of this song, between 29s - 31s:
 Here is what we are currently detecting with the MVP (blast beats in red):
 
 ![Dying_Fetus___Subjected_To_A_Beating.png](output/Dying_Fetus___Subjected_To_A_Beating.png)
+
+<details>
+<summary>More experiments</summary>
+    
 ![SUFFOCATION___Perpetual_Deception.png](output/SUFFOCATION___Perpetual_Deception.png)
+
 ![CURETAJE___Arutam.png](output/CURETAJE___Arutam.png)
+
+</details>
 
 ## MVP Roadmap
 
