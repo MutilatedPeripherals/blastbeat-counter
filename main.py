@@ -4,6 +4,7 @@ from typing import NamedTuple
 import numpy as np
 from numpy.fft import fft
 
+from downloading import download_from_youtube_as_mp3
 from extraction import extract_drums
 from plotting import plot_waveform
 
@@ -116,14 +117,23 @@ def identify_bass_and_snare_frequencies(audio_data: np.ndarray, sample_rate: flo
 
 
 if __name__ == "__main__":
-    base_dir = "/home/linomp/Downloads"
-    default_output_dir = f"./output"
+    LOCAL_FILE_MODE = False
 
-    file = "CURETAJE - Arutam.mp3"
-    # file = "Dying Fetus - Subjected To A Beating.wav"
-    # file = "SUFFOCATION - Perpetual Deception.mp3"
+    if LOCAL_FILE_MODE:
+        # Mode 1:  process local file
+        base_dir = "/home/linomp/Downloads"
+        file = "CURETAJE - Arutam.mp3"
+        # file = "Dying Fetus - Subjected To A Beating.wav"
+        file_path = Path(base_dir) / file
+    else:
+        # Mode 2:  download from YouTube
+        file_url = "https://www.youtube.com/watch?v=K3rDRsEMay0" # DF - Grotesque Impalement
+        #file_url = "https://www.youtube.com/watch?v=0kXrc1DdhHs" # Curetaje - el diablo baila punk
+        success, file_path = download_from_youtube_as_mp3(file_url)
+        if not success or file_path is None:
+            raise RuntimeError("Failed to download the YouTube video.")
+        file_path = Path(file_path)
 
-    file_path = Path(base_dir) / file
     time, audio_data, sample_rate = extract_drums(file_path)
     bass_drum_freq, snare_freq = identify_bass_and_snare_frequencies(audio_data, sample_rate)
     print(f"Identified bass drum frequency: {bass_drum_freq} Hz, snare frequency: {snare_freq} Hz")
