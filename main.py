@@ -2,10 +2,9 @@ from pathlib import Path
 from typing import NamedTuple
 
 import numpy as np
-from numpy.fft import fft
-
 from downloading import download_from_youtube_as_mp3
 from extraction import extract_drums
+from numpy.fft import fft
 from plotting import plot_waveform
 
 
@@ -127,8 +126,8 @@ if __name__ == "__main__":
         file_path = Path(base_dir) / file
     else:
         # Mode 2:  download from YouTube
-        file_url = "https://www.youtube.com/watch?v=K3rDRsEMay0" # DF - Grotesque Impalement
-        #file_url = "https://www.youtube.com/watch?v=0kXrc1DdhHs" # Curetaje - el diablo baila punk
+        # file_url = "https://www.youtube.com/watch?v=K3rDRsEMay0" # DF - Grotesque Impalement
+        file_url = "https://www.youtube.com/watch?v=0kXrc1DdhHs" # Curetaje - el diablo baila punk
         success, file_path = download_from_youtube_as_mp3(file_url)
         if not success or file_path is None:
             raise RuntimeError("Failed to download the YouTube video.")
