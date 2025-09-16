@@ -29,6 +29,11 @@ Here we highlighted the first blast beat of this song, between 29s - 31s:
 Here is what we are currently detecting with the MVP (blast beats in red):
 
 ![Dying_Fetus___Subjected_To_A_Beating.png](output/Dying_Fetus___Subjected_To_A_Beating.png)
+Notice the correctly flagged blast beats staring around 29s, alternating with non-blast beat parts.
+
+Here is another one, from the ecuadorian band Curetaje:
+![CURETAJE___Arutam.png](output/CURETAJE___Arutam.png)
+(Yes, in this one the end is all blast beats)
 
 ## MVP Roadmap
 
