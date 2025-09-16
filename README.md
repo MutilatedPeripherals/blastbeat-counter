@@ -1,4 +1,5 @@
 # Blast beat counter
+
 [![Tests](https://github.com/MutilatedPeripherals/blastbeat-counter/actions/workflows/run-tests.yml/badge.svg)](https://github.com/MutilatedPeripherals/blastbeat-counter/actions/workflows/run-tests.yml)
 
 ## Premise
@@ -29,15 +30,6 @@ Here is what we are currently detecting with the MVP (blast beats in red):
 
 ![Dying_Fetus___Subjected_To_A_Beating.png](output/Dying_Fetus___Subjected_To_A_Beating.png)
 
-<details>
-<summary>More experiments</summary>
-    
-![SUFFOCATION___Perpetual_Deception.png](output/SUFFOCATION___Perpetual_Deception.png)
-
-![CURETAJE___Arutam.png](output/CURETAJE___Arutam.png)
-
-</details>
-
 ## MVP Roadmap
 
 - [X] Identify frequencies of snare & bass drum (hihat left for next iteration); hardcoded for now
@@ -47,4 +39,5 @@ Here is what we are currently detecting with the MVP (blast beats in red):
 - [X] If at least 4 consecutive segments contain snare + bass drum, count it as a blast beat
 - [X] Plot the waveform with the blast beat segments highlighted
 - [X] Dynamically identify/estimate snare & bass frequencies & test with a few different songs & drum tuning ranges
-- [ ] Test with other type of blast beats and see what is needed to support them
+- [ ] Improve the output for easier interpretation & validation
+- [ ] Test with other types of blast beats and see what is needed to support them
