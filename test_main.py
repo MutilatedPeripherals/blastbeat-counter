@@ -9,7 +9,7 @@ def test_identify_blasts_1():
         LabeledSection(4,5, True, True),
         LabeledSection(5,6, True, True),
         LabeledSection(6,7, True, False),
-        LabeledSection(7,8, True, False),
+        LabeledSection(7,8, True, False)
     ]
 
     expected = [(2,6)]

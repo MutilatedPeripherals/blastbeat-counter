@@ -80,7 +80,7 @@ def identify_blastbeat_intervals(sections: list[LabeledSection]) -> list[tuple[i
         else:
             if hits_count >= min_hits_threshold:
                 blastbeat_start = sections[blastbeat_start_idx].start_idx
-                blastbeat_end = sections[i].end_idx
+                blastbeat_end = sections[i].start_idx
                 results.append((blastbeat_start, blastbeat_end))
             hits_count = 0
 
@@ -121,6 +121,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--file", type=str)
+    parser.add_argument("--url", type=str)
     args = parser.parse_args()
 
     if args.file:
@@ -128,14 +129,14 @@ if __name__ == "__main__":
         file_path = Path(args.file)
         if not file_path.exists():
             raise FileNotFoundError(f"The specified file does not exist: {file_path}")
-    else:
-        # Mode 2:  download from YouTube (default)
-        # file_url = "https://www.youtube.com/watch?v=K3rDRsEMay0" # DF - Grotesque Impalement
-        file_url = "https://www.youtube.com/watch?v=0kXrc1DdhHs" # Curetaje - el diablo baila punk
-        success, file_path = download_from_youtube_as_mp3(file_url)
+    elif args.url:
+        # Mode 2:  download from YouTube
+        success, file_path = download_from_youtube_as_mp3(args.url)
         if not success or file_path is None:
             raise RuntimeError("Failed to download the YouTube video.")
         file_path = Path(file_path)
+    else:
+        raise ValueError("You must provide either a local file path (--file) or a url to download from YouTube (--url)")
 
     time, audio_data, sample_rate = extract_drums(file_path)
     bass_drum_freq, snare_freq = identify_bass_and_snare_frequencies(audio_data, sample_rate)
