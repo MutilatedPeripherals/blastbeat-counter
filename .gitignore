@@ -1,8 +1,6 @@
 .idea
-input/
-separated/
+tmp/
 venv
 *.wav
 *.mp3
 *.pkl
-experiments/output/

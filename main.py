@@ -2,9 +2,10 @@ from pathlib import Path
 from typing import NamedTuple
 
 import numpy as np
+from numpy.fft import fft
+
 from downloading import download_from_youtube_as_mp3
 from extraction import extract_drums
-from numpy.fft import fft
 from plotting import plot_waveform
 
 
@@ -116,16 +117,19 @@ def identify_bass_and_snare_frequencies(audio_data: np.ndarray, sample_rate: flo
 
 
 if __name__ == "__main__":
-    LOCAL_FILE_MODE = False
+    import argparse
 
-    if LOCAL_FILE_MODE:
-        # Mode 1:  process local file
-        base_dir = "/home/linomp/Downloads"
-        file = "CURETAJE - Arutam.mp3"
-        # file = "Dying Fetus - Subjected To A Beating.wav"
-        file_path = Path(base_dir) / file
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--file", type=str)
+    args = parser.parse_args()
+
+    if args.file:
+        # Mode 1:  use local file
+        file_path = Path(args.file)
+        if not file_path.exists():
+            raise FileNotFoundError(f"The specified file does not exist: {file_path}")
     else:
-        # Mode 2:  download from YouTube
+        # Mode 2:  download from YouTube (default)
         # file_url = "https://www.youtube.com/watch?v=K3rDRsEMay0" # DF - Grotesque Impalement
         file_url = "https://www.youtube.com/watch?v=0kXrc1DdhHs" # Curetaje - el diablo baila punk
         success, file_path = download_from_youtube_as_mp3(file_url)
