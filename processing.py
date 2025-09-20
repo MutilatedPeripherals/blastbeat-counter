@@ -6,7 +6,7 @@ from numpy.fft import fft
 
 from downloading import download_from_youtube_as_mp3
 from extraction import extract_drums
-from plotting import plot_waveform
+from postprocessing import save_result
 
 
 class LabeledSection(NamedTuple):
@@ -117,6 +117,7 @@ def identify_bass_and_snare_frequencies(audio_data: np.ndarray, sample_rate: flo
 
 if __name__ == "__main__":
     import argparse
+    import webbrowser
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--file", type=str)
@@ -143,4 +144,8 @@ if __name__ == "__main__":
 
     labeled_sections = get_sections_labeled_by_percussion_content_from_audio(time, audio_data, sample_rate, bass_drum_freq, snare_freq)
     blastbeat_intervals = identify_blastbeat_intervals(labeled_sections)
-    plot_waveform(time, audio_data, blastbeat_intervals, title=file_path.stem)
+
+    # plot_waveform(time, audio_data, blastbeat_intervals, title=file_path.stem)
+    
+    save_result(time, blastbeat_intervals, file_path)
+    webbrowser.open(f"file://{Path(__file__).parent.resolve()}/demo_ui.html")
