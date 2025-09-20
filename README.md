@@ -22,17 +22,17 @@ to a Beating_), and after isolating the drums and analyzing the spectrogram, we 
 
 Here we highlighted the first blast beat of this song, between 29s - 31s:
 
-![audacity_analysis.png](output/audacity_analysis.png)
+<img width="1448" height="423" alt="audacity_analysis" src="https://github.com/user-attachments/assets/7920a83f-4aa1-45a6-b9cb-cded0658a64c" />
 
 ### Preliminary results
 
 Here is what we are currently detecting with the MVP (blast beats in red):
 
-![Dying_Fetus___Subjected_To_A_Beating.png](output/Dying_Fetus___Subjected_To_A_Beating.png)
+<img width="1784" height="1181" alt="Dying_Fetus___Subjected_To_A_Beating" src="https://github.com/user-attachments/assets/51f43e78-fad6-4ffc-b7aa-c7d2f46c239f" />
 
 Here is another one, from the ecuadorian band Curetaje:
 
-![CURETAJE___Arutam.png](output/CURETAJE___Arutam.png)
+<img width="1784" height="1181" alt="CURETAJE___Arutam" src="https://github.com/user-attachments/assets/8a6c01b2-eb8a-4461-af2b-d6628d6e016b" />
 
 (Yes, in this one the end is all blast beats)
 
