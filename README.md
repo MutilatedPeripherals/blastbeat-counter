@@ -22,17 +22,17 @@ to a Beating_), and after isolating the drums and analyzing the spectrogram, we 
 
 Here we highlighted the first blast beat of this song, between 29s - 31s:
 
-<img width="1448" height="423" alt="audacity_analysis" src="https://github.com/user-attachments/assets/7920a83f-4aa1-45a6-b9cb-cded0658a64c" />
+<img width="100%" alt="audacity_analysis" src="https://github.com/user-attachments/assets/7920a83f-4aa1-45a6-b9cb-cded0658a64c" />
 
 ### Preliminary results
 
 Here is what we are currently detecting with the MVP (blast beats in red):
 
-<img width="1784" height="1181" alt="Dying_Fetus___Subjected_To_A_Beating" src="https://github.com/user-attachments/assets/51f43e78-fad6-4ffc-b7aa-c7d2f46c239f" />
+<img width="100%" alt="Dying_Fetus___Subjected_To_A_Beating" src="https://github.com/user-attachments/assets/51f43e78-fad6-4ffc-b7aa-c7d2f46c239f" />
 
 Here is another one, from the ecuadorian band Curetaje:
 
-<img width="1784" height="1181" alt="CURETAJE___Arutam" src="https://github.com/user-attachments/assets/8a6c01b2-eb8a-4461-af2b-d6628d6e016b" />
+<img width="100%" alt="CURETAJE___Arutam" src="https://github.com/user-attachments/assets/8a6c01b2-eb8a-4461-af2b-d6628d6e016b" />
 
 (Yes, in this one the end is all blast beats)
 
@@ -45,5 +45,5 @@ Here is another one, from the ecuadorian band Curetaje:
 - [X] If at least 4 consecutive segments contain snare + bass drum, count it as a blast beat
 - [X] Plot the waveform with the blast beat segments highlighted
 - [X] Dynamically identify/estimate snare & bass frequencies & test with a few different songs & drum tuning ranges
-- [ ] Improve the output for easier interpretation & validation
+- [X] Improve the output for easier interpretation & validation
 - [ ] Test with other types of blast beats and see what is needed to support them

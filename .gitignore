@@ -5,3 +5,4 @@ venv
 *.mp3
 *.pkl
 output/*
+cache.json
