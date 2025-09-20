@@ -1,4 +1,4 @@
-from main import LabeledSection, identify_blastbeat_intervals
+from processing import LabeledSection, identify_blastbeat_intervals
 
 
 def test_identify_blasts_1():
