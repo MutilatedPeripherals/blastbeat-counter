@@ -14,7 +14,6 @@ def save_result(time: np.ndarray, ranges_to_highlight: list[tuple[int, int]], ti
             "start_time": float(time[start]),
             "end_time": float(time[end-1])
         })
-    output["audio_file_path"] = str(title.name)
 
     zip_path = f"{output_dir}/{title.stem.replace(' ', '_').replace('-', '_')}.zip"
     with ZipFile(zip_path, 'w') as zipf:
