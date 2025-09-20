@@ -90,23 +90,22 @@ def identify_bass_and_snare_frequencies(audio_data: np.ndarray, sample_rate: flo
     # simple approach: fft over the whole song
     freq, intensities = get_frequency_and_intensity_arrays(audio_data, sample_rate)
 
-    # define ranges to look for
     bass_drum_range = (10, 100)
     snare_range = (170, 600)
 
     # find the peak in the bass drum range
-    bass_drum_idx = np.where((freq >= bass_drum_range[0]) & (freq <= bass_drum_range[1]))[0]
-    snare_idx = np.where((freq >= snare_range[0]) & (freq <= snare_range[1]))[0]
+    bass_drum_peak_idx = np.where((freq >= bass_drum_range[0]) & (freq <= bass_drum_range[1]))[0]
+    snare_peak_idx = np.where((freq >= snare_range[0]) & (freq <= snare_range[1]))[0]
 
     bass_drum_freq, snare_freq = None, None
 
-    if bass_drum_idx.size > 0:
-        bass_drum_freq = freq[bass_drum_idx[np.argmax(intensities[bass_drum_idx])]]
+    if bass_drum_peak_idx.size > 0:
+        bass_drum_freq = freq[bass_drum_peak_idx[np.argmax(intensities[bass_drum_peak_idx])]]
     else:
         print("Warning: No bass drum frequency found in the specified range.")
 
-    if snare_idx.size > 0:
-        snare_freq = freq[snare_idx[np.argmax(intensities[snare_idx])]]
+    if snare_peak_idx.size > 0:
+        snare_freq = freq[snare_peak_idx[np.argmax(intensities[snare_peak_idx])]]
     else:
         print("Warning: No snare frequency found in the specified range.")
 
@@ -134,7 +133,7 @@ if __name__ == "__main__":
         success, file_path = download_from_youtube_as_mp3(args.url)
         if not success or file_path is None:
             raise RuntimeError("Failed to download the YouTube video.")
-        file_path = Path(file_path)
+        print(f"Downloaded file to: {file_path}")
     else:
         raise ValueError("You must provide either a local file path (--file) or a url to download from YouTube (--url)")
 
