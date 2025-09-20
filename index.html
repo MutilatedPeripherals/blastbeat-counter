@@ -9,7 +9,7 @@
     <script src="https://unpkg.com/wavesurfer.js@7/dist/plugins/timeline.min.js"></script>
     <style>
         body { font-family: sans-serif; margin: 20px; }
-        #controls { margin-top: 10px; }
+        #controls { margin-top: 10px; display: none; }
         button { margin-right: 10px; }
         #waveform { width: 100%; height: 150px; margin-top: 20px; }
         #timeline { height: 20px; }
@@ -17,7 +17,11 @@
     </style>
 </head>
 <body>
-<h2>Blastbeat Detector</h2>
+<h2>Blastbeat Detection Visualizer</h2>
+
+<p><strong>Warning:</strong> This is a work in progress. This visualizer expects a ZIP file containing an audio file
+    (MP3 or WAV)
+    and a JSON file with the identified blast-beat sections.</p>
 
 <div>
     <label>Load ZIP (audio + JSON):</label>
@@ -69,6 +73,7 @@
 
       wavesurfer.on('ready', () => {
         audioReady = true
+        document.getElementById('controls').style.display = 'block'
         intervals.forEach(({ start_time, end_time }) => {
           regions.addRegion({
             start: start_time,
@@ -85,7 +90,6 @@
 
       const zip = await JSZip.loadAsync(file)
 
-      // Find JSON inside zip
       const jsonFileName = Object.keys(zip.files).find(name => name.endsWith('.json'))
       if (!jsonFileName) { alert("No JSON found in zip"); return; }
 
@@ -93,7 +97,6 @@
       const config = JSON.parse(jsonData)
       const intervals = config.blast_beats || []
 
-      // Find audio inside zip
       const audioFileName = Object.keys(zip.files).find(name => /\.(mp3|wav)$/i.test(name))
       if (!audioFileName) { alert("No audio file found in zip"); return; }
 
