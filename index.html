@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Demo</title>
+    <title>BlastViz</title>
     <script src="https://unpkg.com/jszip@3.10.1/dist/jszip.min.js"></script>
     <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
     <script src="https://unpkg.com/wavesurfer.js@7/dist/plugins/regions.min.js"></script>
@@ -17,12 +17,24 @@
     </style>
 </head>
 <body>
-<h2>Blastbeat Detection Visualizer</h2>
+<h2>BlastViz</h2>
+<h4>Blastbeat Detection Visualizer</h4>
 
-<p><strong>Warning:</strong> This is a work in progress. This visualizer expects a ZIP file containing an audio file
+<hr>
+<p><i><strong>Warning:</strong> This is a work in progress. This visualizer expects a ZIP file containing an audio file
     (MP3 or WAV)
-    and a JSON file with the identified blast-beat sections.</p>
-
+    and a JSON file with the identified blast-beat sections.</i>
+</p>
+<p>Expected JSON structure:</p>
+<pre>
+{
+  "blast_beats": [
+    {"start_time": 12.5, "end_time": 15.0},
+    {"start_time": 30.0, "end_time": 32.5}
+  ]
+}
+</pre>
+<hr>
 <div>
     <label>Load ZIP (audio + JSON):</label>
     <input type="file" id="zipInput" accept=".zip">
