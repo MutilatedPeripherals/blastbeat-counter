@@ -4,3 +4,4 @@ venv
 *.wav
 *.mp3
 *.pkl
+output/*
