@@ -1,9 +1,13 @@
 import shutil
+import warnings
 from pathlib import Path
 
 import demucs.separate
 import librosa
 import numpy as np
+
+# TODO: fix; perhaps coming from htdemucs or librosa
+warnings.filterwarnings("ignore", message="Torchaudio's I/O functions now support per-call backend dispatch")
 
 
 def read_audio_file(input_file_path: Path) -> tuple[np.ndarray, np.ndarray, float]:
@@ -20,6 +24,7 @@ def extract_drums(input_file_path: Path) -> tuple[np.ndarray, np.ndarray, float]
     extracted_drums_file_path = input_file_path.parent / f"{input_file_path.stem}_drums.wav"
 
     if not extracted_drums_file_path.exists():
+        print("Extracting drums")
         temp_file_path = (
                 input_file_path.parent / "htdemucs" / f"{input_file_path.stem}" / "drums.wav"
         )

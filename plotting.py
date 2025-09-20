@@ -115,3 +115,4 @@ def plot_waveform(time: np.ndarray, data:np.ndarray, ranges_to_highlight:list[tu
     fig.suptitle(title, fontsize=14)
     plt.tight_layout()
     plt.savefig(f"{output_dir}/{title.replace(" ", "_").replace("-","_")}.png", dpi=150, bbox_inches="tight")
+    return fig
