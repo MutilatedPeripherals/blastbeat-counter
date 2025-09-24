@@ -138,14 +138,15 @@ if __name__ == "__main__":
     else:
         raise ValueError("You must provide either a local file path (--file) or a url to download from YouTube (--url)")
 
+    print("Separating drum track...")
     time, audio_data, sample_rate = extract_drums(file_path)
     bass_drum_freq, snare_freq = identify_bass_and_snare_frequencies(audio_data, sample_rate)
-    print(f"Identified bass drum frequency: {bass_drum_freq} Hz, snare frequency: {snare_freq} Hz")
+    print(f"Estimated frequencies -- Bass drum: {bass_drum_freq} Hz; Snare drum: {snare_freq} Hz")
 
+    print("Identifying blast beats...")
     labeled_sections = get_sections_labeled_by_percussion_content_from_audio(time, audio_data, sample_rate, bass_drum_freq, snare_freq)
     blastbeat_intervals = identify_blastbeat_intervals(labeled_sections)
 
-    # plot_waveform(time, audio_data, blastbeat_intervals, title=file_path.stem)
-    
+    print("Exporting result...")
     save_result(time, blastbeat_intervals, file_path)
-    webbrowser.open(f"file://{Path(__file__).parent.resolve()}/demo_ui.html")
+    webbrowser.open(f"file://{Path(__file__).parent.resolve()}/index.html")
