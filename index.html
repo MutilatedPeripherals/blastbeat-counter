@@ -19,7 +19,6 @@
 <body>
 <h2>BlastViz</h2>
 <h4>Blastbeat Detection Visualizer</h4>
-
 <hr>
 <p><i><strong>Warning:</strong> This is a work in progress. This visualizer expects a ZIP file containing an audio file
     (MP3 or WAV)
@@ -39,18 +38,16 @@
     <label>Load ZIP (audio + JSON):</label>
     <input type="file" id="zipInput" accept=".zip">
 </div>
-
 <div id="audioPath"></div>
 <div id="waveform"></div>
 <div id="timeline"></div>
-
 <div id="controls">
-    <button id="play">Play/Pause ▶️</button>
+    <button id="play">▶️</button>
 </div>
-
 <script>
     let wavesurfer = null
     let audioReady = false
+    const playBtn = document.getElementById('play')
 
     function initWaveSurfer(audioFile, intervals) {
       if (wavesurfer) {
@@ -58,7 +55,6 @@
         document.getElementById('waveform').innerHTML = ""
         document.getElementById('timeline').innerHTML = ""
       }
-
       const regions = WaveSurfer.Regions.create()
       const timeline = WaveSurfer.Timeline.create({
         container: '#timeline',
@@ -71,7 +67,6 @@
           return `${minutes}:${seconds.toString().padStart(2, "0")}`
         }
       })
-
       wavesurfer = WaveSurfer.create({
         container: '#waveform',
         waveColor: '#1f77b4',
@@ -80,9 +75,7 @@
         height: 150,
         plugins: [regions, timeline]
       })
-
       wavesurfer.load(audioFile)
-
       wavesurfer.on('ready', () => {
         audioReady = true
         document.getElementById('controls').style.display = 'block'
@@ -90,38 +83,42 @@
           regions.addRegion({
             start: start_time,
             end: end_time,
-            color: 'rgba(255, 0, 0, 0.4)'
+            color: 'rgba(255, 0, 0, 0.4)',
+            drag: false,
+            resize: false
           })
         })
       })
+      wavesurfer.on('play', () => playBtn.textContent = '⏸️')
+      wavesurfer.on('pause', () => playBtn.textContent = '▶️')
     }
 
     document.getElementById('zipInput').addEventListener('change', async e => {
       const file = e.target.files[0]
       if (!file) return
-
       const zip = await JSZip.loadAsync(file)
-
       const jsonFileName = Object.keys(zip.files).find(name => name.endsWith('.json'))
       if (!jsonFileName) { alert("No JSON found in zip"); return; }
-
       const jsonData = await zip.files[jsonFileName].async('string')
       const config = JSON.parse(jsonData)
       const intervals = config.blast_beats || []
-
       const audioFileName = Object.keys(zip.files).find(name => /\.(mp3|wav)$/i.test(name))
       if (!audioFileName) { alert("No audio file found in zip"); return; }
-
       const audioBlob = await zip.files[audioFileName].async('blob')
       const audioURL = URL.createObjectURL(audioBlob)
-
       document.getElementById('audioPath').textContent = "Loaded audio: " + audioFileName
-
       initWaveSurfer(audioURL, intervals)
     })
 
-    document.getElementById('play').addEventListener('click', () => {
+    playBtn.addEventListener('click', () => {
       if (wavesurfer && audioReady) wavesurfer.playPause()
+    })
+
+    document.addEventListener('keydown', e => {
+      if (e.code === 'Space' && audioReady) {
+        e.preventDefault()
+        if (wavesurfer) wavesurfer.playPause()
+      }
     })
 </script>
 </body>

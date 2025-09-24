@@ -6,3 +6,5 @@ venv
 *.pkl
 output/*
 cache.json
+localfiles.txt
+urls.txt
