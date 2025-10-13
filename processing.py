@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import NamedTuple
 
 import numpy as np
+import scipy.io.wavfile as wavfile
 from numpy.fft import fft
 
 from downloading import download_from_youtube_as_mp3
@@ -131,11 +132,30 @@ def boost_frequencies(audio: np.ndarray, sample_rate: int, freqs: list[float], w
         boosted_audio /= max_val
     return boosted_audio.astype(audio.dtype)
 
+def process_song(file_path: Path, EXPERIMENTAL_BOOST_DRUM_FREQUENCIES=False):
+    print("Separating drum track...")
+    (time, audio_data, sample_rate), drumtrack_path = extract_drums(file_path, skip_cache=True)
+    bass_drum_freq, snare_freq = identify_bass_and_snare_frequencies(audio_data, sample_rate)
+    print(f"Estimated frequencies -- Bass drum: {bass_drum_freq} Hz; Snare drum: {snare_freq} Hz")
 
+    if EXPERIMENTAL_BOOST_DRUM_FREQUENCIES:
+        print("Boosting drum frequencies...")
+        audio_data = boost_frequencies(audio_data, sample_rate, [bass_drum_freq, snare_freq], width=50, gain_db=6)
+        boosted_file_path = file_path.parent / f"{file_path.stem}_boosted_drums.wav"
+        wavfile.write(boosted_file_path, sample_rate, (audio_data * 32767).astype(np.int16))
+        print(f"Boosted drum audio saved to: {boosted_file_path}")
+        drumtrack_path = boosted_file_path
+
+    print("Identifying blast beats...")
+    labeled_sections = get_sections_labeled_by_percussion_content_from_audio(time, audio_data, sample_rate, bass_drum_freq, snare_freq)
+    blastbeat_intervals = identify_blastbeat_intervals(labeled_sections)
+
+    print("Exporting result...")
+    save_result(time, blastbeat_intervals, file_path, drumtrack_path)
 
 if __name__ == "__main__":
     import argparse
-    # import webbrowser
+    import webbrowser
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--file", type=str)
@@ -156,23 +176,5 @@ if __name__ == "__main__":
     else:
         raise ValueError("You must provide either a local file path (--file) or a url to download from YouTube (--url)")
 
-    print("Separating drum track...")
-    time, audio_data, sample_rate = extract_drums(file_path)
-    bass_drum_freq, snare_freq = identify_bass_and_snare_frequencies(audio_data, sample_rate)
-    print(f"Estimated frequencies -- Bass drum: {bass_drum_freq} Hz; Snare drum: {snare_freq} Hz")
-
-    print("Boosting drum frequencies...")
-    audio_data = boost_frequencies(audio_data, sample_rate, [bass_drum_freq, snare_freq], width=50, gain_db=6)
-    # save the audio data to a file to check it ut
-    boosted_file_path = file_path.parent / f"{file_path.stem}_boosted_drums.wav"
-    from scipy.io import wavfile
-    wavfile.write(boosted_file_path, sample_rate, (audio_data * 32767).astype(np.int16))
-    print(f"Boosted drum audio saved to: {boosted_file_path}")
-
-    print("Identifying blast beats...")
-    labeled_sections = get_sections_labeled_by_percussion_content_from_audio(time, audio_data, sample_rate, bass_drum_freq, snare_freq)
-    blastbeat_intervals = identify_blastbeat_intervals(labeled_sections)
-
-    print("Exporting result...")
-    save_result(time, blastbeat_intervals, file_path)
-    # webbrowser.open(f"file://{Path(__file__).parent.resolve()}/index.html")
+    process_song(file_path)
+    webbrowser.open(f"file://{Path(__file__).parent.resolve()}/index.html")

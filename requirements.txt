@@ -4,3 +4,4 @@ matplotlib==3.10.3
 numpy==1.26.4
 pytest==8.4.1
 yt-dlp==2025.9.5
+diffq==0.2.4

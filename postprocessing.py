@@ -7,7 +7,7 @@ import numpy as np
 base_dir = Path(__file__).parent.resolve()
 default_output_dir = f"{base_dir}/output"
 
-def save_result(time: np.ndarray, ranges_to_highlight: list[tuple[int, int]], title: Path, output_dir:str=default_output_dir):
+def save_result(time: np.ndarray, ranges_to_highlight: list[tuple[int, int]], filepath: Path, drumtrack_path: Path, output_dir:str=default_output_dir):
     output = {"blast_beats": []}
     for start, end in ranges_to_highlight:
         output["blast_beats"].append({
@@ -15,10 +15,11 @@ def save_result(time: np.ndarray, ranges_to_highlight: list[tuple[int, int]], ti
             "end_time": float(time[end-1])
         })
 
-    zip_path = f"{output_dir}/{title.stem.replace(' ', '_').replace('-', '_')}.zip"
+    zip_path = f"{output_dir}/{filepath.stem.replace(' ', '_').replace('-', '_')}.zip"
     with ZipFile(zip_path, 'w') as zipf:
-        zipf.writestr(f"{title.stem.replace(' ', '_').replace('-', '_')}.json", json.dumps(output, indent=4))
-        zipf.write(title, arcname=title.name)
+        zipf.writestr(f"{filepath.stem.replace(' ', '_').replace('-', '_')}.json", json.dumps(output, indent=4))
+        zipf.write(filepath, arcname=filepath.name)
+        zipf.write(drumtrack_path, arcname=drumtrack_path.name)
 
-    print(f"Exported zip with audio and JSON to: {zip_path}")
+    print(f"Exported zip with audio, drumtrack, and JSON to: {zip_path}")
     return zip_path

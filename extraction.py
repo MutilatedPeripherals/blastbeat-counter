@@ -17,25 +17,32 @@ def read_audio_file(input_file_path: Path) -> tuple[np.ndarray, np.ndarray, floa
     return time, y.astype(np.float32), sample_rate
 
 
-def extract_drums(input_file_path: Path) -> tuple[np.ndarray, np.ndarray, float]:
+def extract_drums(input_file_path: Path, skip_cache=False) -> tuple[tuple[np.ndarray, np.ndarray, float], Path]:
     if not input_file_path.exists():
         raise FileNotFoundError(f"The input file {input_file_path.as_posix()} does not exist.")
 
     extracted_drums_file_path = input_file_path.parent / f"{input_file_path.stem}_drums.wav"
 
-    if not extracted_drums_file_path.exists():
+    if skip_cache or not extracted_drums_file_path.exists():
         print("Extracting drums")
         temp_file_path = (
-                input_file_path.parent / "htdemucs" / f"{input_file_path.stem}" / "drums.wav"
+                input_file_path.parent / "mdx_extra_q" / f"{input_file_path.stem}" / "drums.wav"
         )
+        # temp_file_path = (
+        #         input_file_path.parent / "htdemucs" / f"{input_file_path.stem}" / "drums.wav"
+        # )
         print("Isolating drums with Demucs...")
+        # demucs.separate.main(
+        #     ["--two-stems", "drums", "--device", "cuda", "-o", f"{input_file_path.parent}", input_file_path.as_posix()]
+        # )
         demucs.separate.main(
-            ["--two-stems", "drums", "--device", "cuda", "-o", f"{input_file_path.parent}", input_file_path.as_posix()]
+            ["--two-stems", "drums", "--device", "cuda", "-n", "mdx_extra_q", "-o", f"{input_file_path.parent}",
+             input_file_path.as_posix()]
         )
         shutil.copy(temp_file_path, extracted_drums_file_path)
         shutil.rmtree(temp_file_path.parent)
 
-    return read_audio_file(extracted_drums_file_path)
+    return read_audio_file(extracted_drums_file_path), extracted_drums_file_path
 
 
 if __name__ == "__main__":
