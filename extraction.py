@@ -26,18 +26,11 @@ def extract_drums(input_file_path: Path, skip_cache=False) -> tuple[tuple[np.nda
     if skip_cache or not extracted_drums_file_path.exists():
         print("Extracting drums")
         temp_file_path = (
-                input_file_path.parent / "mdx_extra_q" / f"{input_file_path.stem}" / "drums.wav"
+                input_file_path.parent / "htdemucs" / f"{input_file_path.stem}" / "drums.wav"
         )
-        # temp_file_path = (
-        #         input_file_path.parent / "htdemucs" / f"{input_file_path.stem}" / "drums.wav"
-        # )
         print("Isolating drums with Demucs...")
-        # demucs.separate.main(
-        #     ["--two-stems", "drums", "--device", "cuda", "-o", f"{input_file_path.parent}", input_file_path.as_posix()]
-        # )
         demucs.separate.main(
-            ["--two-stems", "drums", "--device", "cuda", "-n", "mdx_extra_q", "-o", f"{input_file_path.parent}",
-             input_file_path.as_posix()]
+            ["--two-stems", "drums", "--device", "cuda", "-o", f"{input_file_path.parent}", input_file_path.as_posix()]
         )
         shutil.copy(temp_file_path, extracted_drums_file_path)
         shutil.rmtree(temp_file_path.parent)
