@@ -7,11 +7,13 @@
     <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
     <script src="https://unpkg.com/wavesurfer.js@7/dist/plugins/regions.min.js"></script>
     <script src="https://unpkg.com/wavesurfer.js@7/dist/plugins/timeline.min.js"></script>
+    <script src="https://unpkg.com/wavesurfer.js@7/dist/plugins/spectrogram.min.js"></script>
     <style>
         body { font-family: sans-serif; margin: 20px; }
-        #controls { margin-top: 10px; display: none; align-items:center;gap:2px;}
+        #controls { margin-top: 10px;  margin-bottom: 10px; display: none; align-items:center;gap:2px;}
         button { margin-right: 10px; }
-        #waveform { width: 100%; height: 150px; margin-top: 10px; }
+        #waveform { width: 100%; height: 150px; margin-top: 10px; margin-bottom: 10px;}
+        #spectrogram { width: 100%; height: 150px; margin-top: 10px; margin-bottom: 10px;}
         #timeline { height: 20px; }
         #audioPath { margin-top: 10px; font-style: italic; color: #444; font-size: 0.9em;}
         #snareFreq { font-style: italic; color: #444; font-size: 0.9em; }
@@ -48,12 +50,13 @@
 <div id="audioPath"></div>
 <div id="snareFreq"></div>
 <div id="bassdrumFreq"></div>
-<div id="waveform"></div>
-<div id="timeline"></div>
 <div id="controls">
     <button id="play">▶️</button>
     <div id="currentTime" style="margin-top:5px;font-family:monospace;">0:00</div>
 </div>
+<div id="timeline"></div>
+<div id="waveform"></div>
+<div id="spectrogram"></div>
 <script>
     let wavesurfer = null
     let audioReady = false
@@ -75,13 +78,26 @@
           return `${minutes}:${seconds.toString().padStart(2, "0")}`
         }
       })
+      const spectrogram = WaveSurfer.Spectrogram.create({
+        container: '#spectrogram',
+        labels: true,
+        labelsHzColor: '#02f7eb',
+        labelsColor: '#02f7eb',
+        frequencyMax: 500,
+        frequencyMin: 1,
+        scale: "mel",
+        rangeDB: 60,
+        gainDB: 20,
+        windowFunc: 'hann',
+        colorMap:  'roseus'
+      })
       wavesurfer = WaveSurfer.create({
         container: '#waveform',
-        waveColor: '#1f77b4',
-        progressColor: '#2ca02c',
+        waveColor: '#000000',
+        progressColor: '#808080',
         cursorColor: '#ff0000',
         height: 150,
-        plugins: [regions, timeline]
+        plugins: [regions, timeline, spectrogram]
       })
       wavesurfer.load(audioFile)
       wavesurfer.on('ready', () => {
@@ -91,7 +107,7 @@
           regions.addRegion({
             start: start_time,
             end: end_time,
-            color: 'rgba(255, 0, 0, 0.4)',
+            color: 'rgba(2, 247, 7, 0.3)',
             drag: false,
             resize: false
           })
