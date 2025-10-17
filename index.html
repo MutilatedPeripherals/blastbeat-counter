@@ -9,11 +9,13 @@
     <script src="https://unpkg.com/wavesurfer.js@7/dist/plugins/timeline.min.js"></script>
     <style>
         body { font-family: sans-serif; margin: 20px; }
-        #controls { margin-top: 10px; display: none; }
+        #controls { margin-top: 10px; display: none; align-items:center;gap:2px;}
         button { margin-right: 10px; }
-        #waveform { width: 100%; height: 150px; margin-top: 20px; }
+        #waveform { width: 100%; height: 150px; margin-top: 10px; }
         #timeline { height: 20px; }
-        #audioPath { margin-top: 10px; font-style: italic; color: #444; }
+        #audioPath { margin-top: 10px; font-style: italic; color: #444; font-size: 0.9em;}
+        #snareFreq { font-style: italic; color: #444; font-size: 0.9em; }
+        #bassdrumFreq { font-style: italic; color: #444; font-size: 0.9em; }
         .radio-group { margin-top: 10px; margin-bottom: 10px; }
         .load-control { margin-top: 15px; }
     </style>
@@ -36,23 +38,26 @@
 </pre>
 <hr>
 <div class="radio-group">
-    <label><input type="radio" name="trackType" value="full" checked> Full Song</label>
+    <label><input type="radio" name="trackType" value="full" checked> Full Band</label>
     <label><input type="radio" name="trackType" value="drums"> Drums Only</label>
 </div>
 <hr>
 <div class="load-control">
-    <label>Load ZIP (audio + JSON):</label>
     <input type="file" id="zipInput" accept=".zip">
 </div>
 <div id="audioPath"></div>
+<div id="snareFreq"></div>
+<div id="bassdrumFreq"></div>
 <div id="waveform"></div>
 <div id="timeline"></div>
 <div id="controls">
     <button id="play">▶️</button>
+    <div id="currentTime" style="margin-top:5px;font-family:monospace;">0:00</div>
 </div>
 <script>
     let wavesurfer = null
     let audioReady = false
+    let currentZipFile = null
     const playBtn = document.getElementById('play')
 
     function initWaveSurfer(audioFile, intervals) {
@@ -64,9 +69,6 @@
       const regions = WaveSurfer.Regions.create()
       const timeline = WaveSurfer.Timeline.create({
         container: '#timeline',
-        primaryLabelInterval: 5,
-        secondaryLabelInterval: 1,
-        timeInterval: 1,
         formatTimeCallback: sec => {
           const minutes = Math.floor(sec / 60)
           const seconds = Math.floor(sec % 60)
@@ -84,7 +86,7 @@
       wavesurfer.load(audioFile)
       wavesurfer.on('ready', () => {
         audioReady = true
-        document.getElementById('controls').style.display = 'block'
+        document.getElementById('controls').style.display = 'flex'
         intervals.forEach(({ start_time, end_time }) => {
           regions.addRegion({
             start: start_time,
@@ -97,18 +99,21 @@
       })
       wavesurfer.on('play', () => playBtn.textContent = '⏸️')
       wavesurfer.on('pause', () => playBtn.textContent = '▶️')
+      const timeDisplay = document.getElementById('currentTime')
+      wavesurfer.on('timeupdate', t => {
+          const minutes = Math.floor(t / 60)
+          const seconds = Math.floor(t % 60)
+          timeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`
+      })
     }
 
-    document.getElementById('zipInput').addEventListener('change', async e => {
-      const file = e.target.files[0]
-      if (!file) return
-      const zip = await JSZip.loadAsync(file)
+    async function loadZip(zipFile) {
+      const zip = await JSZip.loadAsync(zipFile)
       const jsonFileName = Object.keys(zip.files).find(name => name.endsWith('.json'))
-      if (!jsonFileName) { alert("No JSON found in zip"); return; }
+      if (!jsonFileName) { alert("No JSON found in zip"); return }
       const jsonData = await zip.files[jsonFileName].async('string')
       const config = JSON.parse(jsonData)
       const intervals = config.blast_beats || []
-
       const trackType = document.querySelector('input[name="trackType"]:checked').value
       let audioFileName = null
       if (trackType === "drums") {
@@ -117,12 +122,28 @@
       if (!audioFileName) {
         audioFileName = Object.keys(zip.files).find(name => /\.(mp3|wav)$/i.test(name))
       }
-      if (!audioFileName) { alert("No audio file found in zip"); return; }
-
+      if (!audioFileName) { alert("No audio file found in zip"); return }
       const audioBlob = await zip.files[audioFileName].async('blob')
       const audioURL = URL.createObjectURL(audioBlob)
-      document.getElementById('audioPath').textContent = "Loaded audio: " + audioFileName
+      document.getElementById('audioPath').textContent = "Track: " + audioFileName
+      if (config.snare_frequency !== undefined)
+          document.getElementById('snareFreq').textContent = "Snare drum freq: " + config.snare_frequency.toFixed(2) + " Hz"
+      if (config.bass_drum_frequency !== undefined)
+          document.getElementById('bassdrumFreq').textContent = "Bass drum freq: " + config.bass_drum_frequency.toFixed(2) + " Hz"
       initWaveSurfer(audioURL, intervals)
+    }
+
+    document.getElementById('zipInput').addEventListener('change', e => {
+      const file = e.target.files[0]
+      if (!file) return
+      currentZipFile = file
+      loadZip(file)
+    })
+
+    document.querySelectorAll('input[name="trackType"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        if (currentZipFile) loadZip(currentZipFile)
+      })
     })
 
     playBtn.addEventListener('click', () => {

@@ -32,5 +32,5 @@ else:
 
 print(f"Processing {len(paths)} files...")
 for path in paths:
-    process_song(path, EXPERIMENTAL_BOOST_DRUM_FREQUENCIES=False)
+    process_song(path)
     print("-----")
