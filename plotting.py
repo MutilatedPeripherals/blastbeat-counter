@@ -7,7 +7,9 @@ base_dir = Path(__file__).parent.resolve()
 default_output_dir = f"{base_dir}/output"
 
 
-def plot_waveform_and_spectrogram(time, data, ffts, chunk_duration, title, output_dir=default_output_dir):
+def plot_waveform_and_spectrogram(
+    time, data, ffts, chunk_duration, title, output_dir=default_output_dir
+):
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8))
 
     ax1.plot(time, data, linewidth=1)
@@ -34,7 +36,11 @@ def plot_waveform_and_spectrogram(time, data, ffts, chunk_duration, title, outpu
 
     fig.suptitle(title, fontsize=14)
     plt.tight_layout()
-    plt.savefig(f"{output_dir}/{title.replace(" ", "_").replace("-","_")}.png", dpi=150, bbox_inches="tight")
+    plt.savefig(
+        f"{output_dir}/{title.replace(" ", "_").replace("-","_")}.png",
+        dpi=150,
+        bbox_inches="tight",
+    )
 
 
 def plot_audio_with_fft_range(
@@ -45,7 +51,7 @@ def plot_audio_with_fft_range(
     end_time: float,
     fft_fn: callable = None,
     title: str = "Audio fragment with FFT",
-    output_dir=default_output_dir
+    output_dir=default_output_dir,
 ):
     start_idx = int(start_time * sample_rate)
     end_idx = int(end_time * sample_rate)
@@ -81,7 +87,13 @@ def plot_audio_with_fft_range(
     return freq, fft_magnitude
 
 
-def plot_waveform(time: np.ndarray, data:np.ndarray, ranges_to_highlight:list[tuple[int, int]], title:str="test", output_dir=default_output_dir):
+def plot_waveform(
+    time: np.ndarray,
+    data: np.ndarray,
+    ranges_to_highlight: list[tuple[int, int]],
+    title: str = "test",
+    output_dir=default_output_dir,
+):
     highlighted_time_elements = []
     highlighted_data_elements = []
     non_highlighted_time_elements = []
@@ -103,10 +115,26 @@ def plot_waveform(time: np.ndarray, data:np.ndarray, ranges_to_highlight:list[tu
         non_highlighted_data_elements.extend(data[curr_idx:])
 
     fig, ax1 = plt.subplots(1, 1, figsize=(12, 8))
-    ax1.scatter(non_highlighted_time_elements, non_highlighted_data_elements, color='blue', marker='o', label='Other', s=0.01)
-    ax1.scatter(highlighted_time_elements, highlighted_data_elements, color='red', marker='o', label='Blast-beats', s=0.01)
+    ax1.scatter(
+        non_highlighted_time_elements,
+        non_highlighted_data_elements,
+        color="blue",
+        marker="o",
+        label="Other",
+        s=0.01,
+    )
+    ax1.scatter(
+        highlighted_time_elements,
+        highlighted_data_elements,
+        color="red",
+        marker="o",
+        label="Blast-beats",
+        s=0.01,
+    )
     ax1.set_xticks(np.arange(0, time[-1] + 1, 15))
-    ax1.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f"{int(x // 60)}:{int(x % 60):02d}"))
+    ax1.xaxis.set_major_formatter(
+        plt.FuncFormatter(lambda x, _: f"{int(x // 60)}:{int(x % 60):02d}")
+    )
     ax1.set_xlim(time[0], time[-1])
     ax1.grid(True, alpha=0.3)
     ax1.set_xlabel("Time")
@@ -114,5 +142,9 @@ def plot_waveform(time: np.ndarray, data:np.ndarray, ranges_to_highlight:list[tu
 
     fig.suptitle(title, fontsize=14)
     plt.tight_layout()
-    plt.savefig(f"{output_dir}/{title.replace(" ", "_").replace("-","_")}.png", dpi=150, bbox_inches="tight")
+    plt.savefig(
+        f"{output_dir}/{title.replace(" ", "_").replace("-","_")}.png",
+        dpi=150,
+        bbox_inches="tight",
+    )
     return fig
