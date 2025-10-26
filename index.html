@@ -6,7 +6,6 @@
     <script src="https://unpkg.com/jszip@3.10.1/dist/jszip.min.js"></script>
     <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
     <script src="https://unpkg.com/wavesurfer.js@7/dist/plugins/regions.min.js"></script>
-    <script src="https://unpkg.com/wavesurfer.js@7/dist/plugins/timeline.min.js"></script>
     <script src="https://unpkg.com/wavesurfer.js@7/dist/plugins/spectrogram.min.js"></script>
     <style>
         body { font-family: sans-serif; margin: 20px; }
@@ -14,7 +13,6 @@
         #zipInput { margin-right: 10px; }
         #waveform { width: 100%; height: 150px; margin-top: 10px; margin-bottom: 10px;}
         #spectrogram { width: 100%; height: 150px; margin-top: 10px; margin-bottom: 15px;}
-        #timeline { height: 20px; }
         #track-info { margin-top: 10px; font-style: italic; color: #444; font-size: 0.9em;}
         #currentTime { margin-top: 5px; font-family:monospace; font-size: 2em;}
         .radio-group { margin-top: 10px; margin-bottom: 10px; }
@@ -53,9 +51,8 @@
     <span id="audioPath"></span> <span id="snareFreq"></span> <span id="bassdrumFreq"></span>
 </div>
 <div id="controls">
-    <div id="currentTime">0:00</div>
+    <div id="currentTime">0:00:000</div>
 </div>
-<div id="timeline"></div>
 <div id="waveform"></div>
 <div id="spectrogram"></div>
 <script>
@@ -80,11 +77,10 @@
       if (wavesurfer) {
         wavesurfer.destroy()
         document.getElementById('waveform').innerHTML = ""
-        document.getElementById('timeline').innerHTML = ""
         document.getElementById('spectrogram').innerHTML = ""
+        document.getElementById('currentTime').textContent = "0:00:000"
       }
       const regions = WaveSurfer.Regions.create()
-      const timeline = WaveSurfer.Timeline.create({ container: '#timeline' })
       const spectrogram = WaveSurfer.Spectrogram.create({
         container: '#spectrogram',
         labels: true,
@@ -102,7 +98,7 @@
         progressColor: '#888',
         cursorColor: '#f00',
         height: 150,
-        plugins: [regions, timeline, spectrogram]
+        plugins: [regions, spectrogram]
       })
       wavesurfer.load(audioFile)
       wavesurfer.on('ready', () => {
@@ -122,7 +118,8 @@
       wavesurfer.on('timeupdate', t => {
         const m = Math.floor(t / 60)
         const s = Math.floor(t % 60)
-        document.getElementById('currentTime').textContent = `${m}:${s.toString().padStart(2, '0')}`
+        const ms = Math.floor((t % 1) * 1000)
+        document.getElementById('currentTime').textContent = `${m}:${s.toString().padStart(2, '0')}:${ms.toString().padStart(3, '0')}`
       })
       document.getElementById('waveform').addEventListener('wheel', handleWheelZoom, { passive: false })
       document.getElementById('spectrogram').addEventListener('wheel', handleWheelZoom, { passive: false })
