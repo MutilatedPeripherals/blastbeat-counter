@@ -37,8 +37,8 @@ def is_peak_present_around_frequency(
     freq_to_find: float,
     frequencies: np.ndarray,
     intensities: np.ndarray,
-    band_width: float = 10.0,
-    threshold=10,  # 37.6,
+    band_width: float = 10.0,  # important magical constant
+    threshold=37.6,  # important magical constant
 ) -> bool:
     lower_bound = freq_to_find - band_width
     upper_bound = freq_to_find + band_width
