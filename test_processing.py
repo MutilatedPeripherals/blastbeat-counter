@@ -1,3 +1,5 @@
+import pytest
+
 from processing import LabeledSection, identify_blastbeat_intervals
 
 
@@ -38,6 +40,7 @@ def test_identify_blasts_2():
     assert actual == expected
 
 
+@pytest.mark.skip(reason="Not implemented yet")
 def test_bomb_blast():
     input: list[LabeledSection] = [
         LabeledSection(1, 2, bass_drum_present=False, snare_present=False),

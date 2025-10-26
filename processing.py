@@ -37,8 +37,8 @@ def is_peak_present_around_frequency(
     freq_to_find: float,
     frequencies: np.ndarray,
     intensities: np.ndarray,
-    band_width: float = 10.0,
-    threshold=37.6,
+    band_width: float = 10.0,  # important magical constant
+    threshold=37.6,  # important magical constant
 ) -> bool:
     lower_bound = freq_to_find - band_width
     upper_bound = freq_to_find + band_width
@@ -199,3 +199,10 @@ if __name__ == "__main__":
 
     if OPEN_BROWSER_AFTER_PROCESSING:
         webbrowser.open(f"file://{Path(__file__).parent.resolve()}/index.html")
+
+# TODO:
+# - support per-song config of window size (currently fixed at 0.1s) and peak threshold (currently fixed 37.6), can be comma separated in same input file
+# - experiment with compression of drum track before fft?
+# - improve blast beat detection algorithm (support bomb blasts, slow blasts etc.)
+# - investigate false positives in benighted song & calicuchima
+# - come up with f-score??
