@@ -37,8 +37,8 @@ def is_peak_present_around_frequency(
     freq_to_find: float,
     frequencies: np.ndarray,
     intensities: np.ndarray,
-    band_width: float = 10.0,  # important magical constant
-    threshold=37.6,  # important magical constant
+    band_width: float,
+    threshold: float,
 ) -> bool:
     lower_bound = freq_to_find - band_width
     upper_bound = freq_to_find + band_width
@@ -54,11 +54,17 @@ def is_peak_present_around_frequency(
 
 
 def get_sections_labeled_by_percussion_content_from_audio(
-    time, data, sample_rate, bass_drum_freq, snare_drum_freq
+    time: np.ndarray,
+    data: np.ndarray,
+    sample_rate: float,
+    bass_drum_freq: float,
+    snare_drum_freq: float,
+    step_size_in_seconds: float,
+    band_width: float,
+    threshold: float,
 ) -> list[LabeledSection]:
     results = []
 
-    step_size_in_seconds = 0.1  # most important magical constant of the whole project.
     step_size_in_samples = int(step_size_in_seconds * sample_rate)
 
     for start_idx in range(0, len(time), step_size_in_samples):
@@ -70,10 +76,10 @@ def get_sections_labeled_by_percussion_content_from_audio(
         )
 
         snare_present = is_peak_present_around_frequency(
-            snare_drum_freq, freq, fft_magnitude
+            snare_drum_freq, freq, fft_magnitude, band_width, threshold
         )
         bass_drum_present = is_peak_present_around_frequency(
-            bass_drum_freq, freq, fft_magnitude
+            bass_drum_freq, freq, fft_magnitude, band_width, threshold
         )
 
         results.append(
@@ -113,6 +119,9 @@ def identify_bass_and_snare_frequencies(
     # simple approach: fft over the whole song
     freq, intensities = get_frequency_and_intensity_arrays(audio_data, sample_rate)
 
+    # TODO: make these overrides configurable
+    # bass_drum_range = (40, 100)
+    # snare_range = (200, 600)
     bass_drum_range = (10, 100)
     snare_range = (170, 600)
 
@@ -141,13 +150,24 @@ def identify_bass_and_snare_frequencies(
             "Could not identify bass drum or snare frequencies. Please check the audio file."
         )
 
+    # plot_fft_with_markers(
+    #     freq,
+    #     intensities,
+    #     bass_drum_freq,
+    #     snare_freq,
+    #     title="dwef - wacht",
+    #     bass_drum_range=bass_drum_range,
+    #     snare_range=snare_range,
+    # )
     return bass_drum_freq, snare_freq
 
 
-def process_song(file_path: Path):
+def process_song(
+    file_path: Path, band_width=10.0, threshold=37.6, step_size_in_seconds=0.1
+):
     print("Separating drum track...")
     (time, audio_data, sample_rate), drumtrack_path = extract_drums(
-        file_path, skip_cache=True
+        file_path, skip_cache=False
     )
     bass_drum_freq, snare_freq = identify_bass_and_snare_frequencies(
         audio_data, sample_rate
@@ -158,7 +178,14 @@ def process_song(file_path: Path):
 
     print("Identifying blast beats...")
     labeled_sections = get_sections_labeled_by_percussion_content_from_audio(
-        time, audio_data, sample_rate, bass_drum_freq, snare_freq
+        time,
+        audio_data,
+        sample_rate,
+        bass_drum_freq,
+        snare_freq,
+        step_size_in_seconds,
+        band_width,
+        threshold,
     )
     blastbeat_intervals = identify_blastbeat_intervals(labeled_sections)
 
@@ -201,7 +228,6 @@ if __name__ == "__main__":
         webbrowser.open(f"file://{Path(__file__).parent.resolve()}/index.html")
 
 # TODO:
-# - support per-song config of window size (currently fixed at 0.1s) and peak threshold (currently fixed 37.6), can be comma separated in same input file
 # - experiment with compression of drum track before fft?
 # - improve blast beat detection algorithm (support bomb blasts, slow blasts etc.)
 # - investigate false positives in benighted song & calicuchima

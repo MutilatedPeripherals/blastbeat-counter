@@ -134,8 +134,14 @@
       const intervals = config.blast_beats || []
       const trackType = document.querySelector('input[name="trackType"]:checked').value
       let audioFileName = null
-      if (trackType === "drums") audioFileName = Object.keys(zip.files).find(n => /drum/i.test(n) && /\.(mp3|wav)$/i.test(n))
-      if (!audioFileName) audioFileName = Object.keys(zip.files).find(n => /\.(mp3|wav)$/i.test(n))
+      if (trackType === "drums") {
+          audioFileName = Object.keys(zip.files).find(n => /_drums\.(mp3|wav)$/i.test(n))
+          if (!audioFileName) return alert("Drums-only file (_drums) not found in zip")
+        } else {
+          audioFileName = Object.keys(zip.files).find(n => /\.(mp3|wav)$/i.test(n) && !/_drums\./i.test(n))
+        }
+      console.log(trackType)
+      console.log("Selected audio file:", audioFileName)
       if (!audioFileName) return alert("No audio file found in zip")
       const audioBlob = await zip.files[audioFileName].async('blob')
       const audioURL = URL.createObjectURL(audioBlob)
