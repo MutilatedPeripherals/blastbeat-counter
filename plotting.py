@@ -75,7 +75,7 @@ def plot_fft_with_markers(
     fft_magnitude: np.ndarray,
     bass_drum_freq: float,
     snare_drum_freq: float,
-    title: str,
+    title: str = "identified_freqs",
     bass_drum_range: tuple[int, int] | None = None,
     snare_range: tuple[int, int] | None = None,
     output_dir=default_output_dir,
@@ -85,7 +85,6 @@ def plot_fft_with_markers(
     ax.plot(freq, fft_magnitude, linewidth=1)
     ax.set_xlabel("Frequency (Hz)")
     ax.set_ylabel("Magnitude")
-    ax.set_yscale("log")
     ax.set_ylim(1e0, fft_magnitude.max() * 1.1)
     ax.set_xlim(0, snare_range[1] + 10)
     ax.grid(True, alpha=0.3)

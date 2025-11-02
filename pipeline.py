@@ -5,41 +5,68 @@ from pathlib import Path
 from downloading import download_from_youtube_as_mp3
 from processing import process_song
 
-parser = argparse.ArgumentParser()
-parser.add_argument("csv_path", type=Path)
-args = parser.parse_args()
 
-with open(args.csv_path, newline="") as f:
-    reader = csv.DictReader(line for line in f if not line.lstrip().startswith("#"))
-    rows = [row for row in reader if row.get("src")]
+def parse_float(row, key):
+    return float(row[key]) if row.get(key) else None
 
-for row in rows:
-    src = row["src"].strip()
-    band_width = float(row["band_width"]) if row.get("band_width") else None
-    threshold = float(row["threshold"]) if row.get("threshold") else None
-    step_size = (
-        float(row["step_size_in_seconds"]) if row.get("step_size_in_seconds") else None
+
+def parse_range(row, start, end):
+    return (
+        (float(row[start]), float(row[end]))
+        if row.get(start) and row.get(end)
+        else None
     )
 
-    if src.startswith("http://") or src.startswith("https://"):
-        print(f"Processing YouTube URL: {src}")
-        success, file_path = download_from_youtube_as_mp3(src)
-        if not success or not file_path:
-            print(f"Failed to download: {src}")
-            continue
-    else:
-        file_path = Path(src)
-        if not file_path.exists():
-            print(f"File does not exist: {file_path}")
-            continue
 
-    kwargs = {}
-    if band_width is not None:
-        kwargs["band_width"] = band_width
-    if threshold is not None:
-        kwargs["threshold"] = threshold
-    if step_size is not None:
-        kwargs["step_size_in_seconds"] = step_size
+def load_rows(csv_path):
+    with open(csv_path, newline="") as f:
+        return [
+            r
+            for r in csv.DictReader(l for l in f if not l.lstrip().startswith("#"))
+            if r.get("src")
+        ]
 
-    process_song(file_path, **kwargs)
-    print("-----")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("csv_path", type=Path)
+    args = parser.parse_args()
+
+    for row in load_rows(args.csv_path):
+        src = row["src"].strip()
+        file_path = None
+
+        if src.startswith(("http://", "https://")):
+            print(f"Processing YouTube URL: {src}")
+            success, file_path = download_from_youtube_as_mp3(src)
+            if not success or not file_path:
+                print(f"Failed to download: {src}")
+                continue
+        else:
+            file_path = Path(src)
+            if not file_path.exists():
+                print(f"File does not exist: {file_path}")
+                continue
+
+        kwargs = {
+            k: v
+            for k, v in {
+                "peak_detection_band_width": parse_float(
+                    row, "peak_detection_band_width"
+                ),
+                "peak_detection_min_area_threshold": parse_float(
+                    row, "peak_detection_min_area_threshold"
+                ),
+                "step_size_in_seconds": parse_float(row, "step_size_in_seconds"),
+                "bass_drum_range": parse_range(
+                    row, "bass_drum_range_start", "bass_drum_range_end"
+                ),
+                "snare_range": parse_range(
+                    row, "snare_drum_range_start", "snare_drum_range_end"
+                ),
+            }.items()
+            if v is not None
+        }
+
+        process_song(file_path, **kwargs)
+        print("-----")

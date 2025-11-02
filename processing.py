@@ -6,6 +6,7 @@ from numpy.fft import fft
 
 from downloading import download_from_youtube_as_mp3
 from extraction import extract_drums
+from plotting import plot_fft_with_markers
 from postprocessing import save_result
 
 
@@ -37,20 +38,20 @@ def is_peak_present_around_frequency(
     freq_to_find: float,
     frequencies: np.ndarray,
     intensities: np.ndarray,
-    band_width: float,
-    threshold: float,
+    peak_detection_band_width: float,
+    peak_detection_min_area_threshold: float,
 ) -> bool:
-    lower_bound = freq_to_find - band_width
-    upper_bound = freq_to_find + band_width
+    lower_bound = freq_to_find - peak_detection_band_width
+    upper_bound = freq_to_find + peak_detection_band_width
 
-    # Martins approach:  sum intensities (proxy for area under the curve), and compare with a threshold -> if meets thresh, it contains a peak around the freq. we're looking for
+    # Martins approach:  sum intensities (proxy for area under the curve), and compare with a peak_detection_min_area_threshold -> if meets thresh, it contains a peak around the freq. we're looking for
     indexes = np.where((frequencies >= lower_bound) & (frequencies <= upper_bound))[0]
     if len(indexes) == 0:
         return False
 
     intensity_sum = np.sum(intensities[indexes])
 
-    return intensity_sum > threshold
+    return intensity_sum > peak_detection_min_area_threshold
 
 
 def get_sections_labeled_by_percussion_content_from_audio(
@@ -60,8 +61,8 @@ def get_sections_labeled_by_percussion_content_from_audio(
     bass_drum_freq: float,
     snare_drum_freq: float,
     step_size_in_seconds: float,
-    band_width: float,
-    threshold: float,
+    peak_detection_band_width: float,
+    peak_detection_min_area_threshold: float,
 ) -> list[LabeledSection]:
     results = []
 
@@ -76,10 +77,18 @@ def get_sections_labeled_by_percussion_content_from_audio(
         )
 
         snare_present = is_peak_present_around_frequency(
-            snare_drum_freq, freq, fft_magnitude, band_width, threshold
+            snare_drum_freq,
+            freq,
+            fft_magnitude,
+            peak_detection_band_width,
+            peak_detection_min_area_threshold,
         )
         bass_drum_present = is_peak_present_around_frequency(
-            bass_drum_freq, freq, fft_magnitude, band_width, threshold
+            bass_drum_freq,
+            freq,
+            fft_magnitude,
+            peak_detection_band_width,
+            peak_detection_min_area_threshold,
         )
 
         results.append(
@@ -93,7 +102,7 @@ def identify_blastbeat_intervals(
     sections: list[LabeledSection],
 ) -> list[tuple[int, int]]:
     # primitive approach:  4 snares+bass in a series at least
-    min_hits_threshold = 4
+    min_hits_peak_detection_min_area_threshold = 3
     blastbeat_start_idx = 0
     hits_count = 0
     results = []
@@ -104,7 +113,7 @@ def identify_blastbeat_intervals(
                 blastbeat_start_idx = i
             hits_count += 1
         else:
-            if hits_count >= min_hits_threshold:
+            if hits_count >= min_hits_peak_detection_min_area_threshold:
                 blastbeat_start = sections[blastbeat_start_idx].start_idx
                 blastbeat_end = sections[i].start_idx
                 results.append((blastbeat_start, blastbeat_end))
@@ -114,16 +123,14 @@ def identify_blastbeat_intervals(
 
 
 def identify_bass_and_snare_frequencies(
-    audio_data: np.ndarray, sample_rate: float
+    audio_data: np.ndarray,
+    sample_rate: float,
+    bass_drum_range: tuple[int, int],
+    snare_range: tuple[int, int],
+    debug_song_name: str | None = None,
 ) -> tuple[float, float]:
     # simple approach: fft over the whole song
     freq, intensities = get_frequency_and_intensity_arrays(audio_data, sample_rate)
-
-    # TODO: make these overrides configurable
-    # bass_drum_range = (40, 100)
-    # snare_range = (200, 600)
-    bass_drum_range = (10, 100)
-    snare_range = (170, 600)
 
     # find the peak in the bass drum range
     bass_drum_peak_idx = np.where(
@@ -150,27 +157,38 @@ def identify_bass_and_snare_frequencies(
             "Could not identify bass drum or snare frequencies. Please check the audio file."
         )
 
-    # plot_fft_with_markers(
-    #     freq,
-    #     intensities,
-    #     bass_drum_freq,
-    #     snare_freq,
-    #     title="dwef - wacht",
-    #     bass_drum_range=bass_drum_range,
-    #     snare_range=snare_range,
-    # )
+    if debug_song_name is not None:
+        plot_fft_with_markers(
+            freq,
+            intensities,
+            bass_drum_freq,
+            snare_freq,
+            bass_drum_range=bass_drum_range,
+            snare_range=snare_range,
+            title=debug_song_name,
+        )
     return bass_drum_freq, snare_freq
 
 
 def process_song(
-    file_path: Path, band_width=10.0, threshold=37.6, step_size_in_seconds=0.1
+    file_path: Path,
+    peak_detection_band_width=10.0,
+    peak_detection_min_area_threshold=37.6,
+    step_size_in_seconds=0.1,
+    bass_drum_range=(10, 100),
+    snare_range=(170, 600),
 ):
     print("Separating drum track...")
     (time, audio_data, sample_rate), drumtrack_path = extract_drums(
         file_path, skip_cache=False
     )
     bass_drum_freq, snare_freq = identify_bass_and_snare_frequencies(
-        audio_data, sample_rate
+        audio_data,
+        sample_rate,
+        bass_drum_range,
+        snare_range,
+        # TODO: remove this when not debugging
+        debug_song_name=file_path.stem,
     )
     print(
         f"Estimated frequencies -- Bass drum: {bass_drum_freq} Hz; Snare drum: {snare_freq} Hz"
@@ -184,8 +202,8 @@ def process_song(
         bass_drum_freq,
         snare_freq,
         step_size_in_seconds,
-        band_width,
-        threshold,
+        peak_detection_band_width,
+        peak_detection_min_area_threshold,
     )
     blastbeat_intervals = identify_blastbeat_intervals(labeled_sections)
 
