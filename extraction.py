@@ -21,8 +21,6 @@ def read_audio_file(input_file_path: Path) -> tuple[np.ndarray, np.ndarray, floa
     y, sample_rate = librosa.load(input_file_path, mono=True)
     time = np.arange(len(y)) / sample_rate
 
-    # TODO: play with Loudness normalisation here
-
     return time, y.astype(np.float32), sample_rate
 
 

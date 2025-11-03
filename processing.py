@@ -92,32 +92,59 @@ def get_sections_labeled_by_percussion_content_from_audio(
         )
 
         results.append(
-            LabeledSection(start_idx, end_idx, snare_present, bass_drum_present)
+            LabeledSection(
+                start_idx,
+                end_idx,
+                snare_present=snare_present,
+                bass_drum_present=bass_drum_present,
+            )
         )
 
     return results
 
 
-def identify_blastbeat_intervals(
-    sections: list[LabeledSection],
-) -> list[tuple[int, int]]:
-    # primitive approach:  4 snares+bass in a series at least
-    min_hits_peak_detection_min_area_threshold = 3
-    blastbeat_start_idx = 0
-    hits_count = 0
+def identify_hammer_blast(sections: list[LabeledSection]) -> list[tuple[int, int]]:
+    # TODO:  name doesn't really capture what this does, because it captures more than just hammer blasts
+    min_hits = 8  # primitive approach: 4 snares+bass in a series at least
+    start_idx = 0
+    hits = 0
     results = []
 
-    for i in range(0, len(sections)):
-        if sections[i].snare_present and sections[i].bass_drum_present:
-            if hits_count == 0:
-                blastbeat_start_idx = i
-            hits_count += 1
+    for i, s in enumerate(sections):
+        if s.snare_present and s.bass_drum_present:
+            if hits == 0:
+                start_idx = i
+            hits += 1
         else:
-            if hits_count >= min_hits_peak_detection_min_area_threshold:
-                blastbeat_start = sections[blastbeat_start_idx].start_idx
-                blastbeat_end = sections[i].start_idx
-                results.append((blastbeat_start, blastbeat_end))
-            hits_count = 0
+            if hits >= min_hits:
+                results.append((sections[start_idx].start_idx, s.start_idx))
+            hits = 0
+
+    return results
+
+
+def identify_traditional_blast(sections: list[LabeledSection]) -> list[tuple[int, int]]:
+    # TODO:  too many false positives in real songs
+    min_hits = 4
+    start_idx = 0
+    hits = 0
+    seen_last_bass = False
+    seen_last_snare = False
+    results = []
+
+    for i, s in enumerate(sections):
+        if not (s.bass_drum_present or s.snare_present):
+            if hits >= min_hits:
+                results.append((sections[start_idx].start_idx, s.start_idx))
+            hits = 0
+        elif (s.bass_drum_present and not seen_last_bass) or (
+            s.snare_present and not seen_last_snare and seen_last_bass
+        ):
+            if hits == 0:
+                start_idx = i
+            hits += 1
+
+        seen_last_bass, seen_last_snare = s.bass_drum_present, s.snare_present
 
     return results
 
@@ -174,21 +201,19 @@ def process_song(
     file_path: Path,
     peak_detection_band_width=10.0,
     peak_detection_min_area_threshold=37.6,
-    step_size_in_seconds=0.1,
+    step_size_in_seconds=0.15,
     bass_drum_range=(10, 100),
     snare_range=(170, 600),
 ):
     print("Separating drum track...")
-    (time, audio_data, sample_rate), drumtrack_path = extract_drums(
-        file_path, skip_cache=False
-    )
+    (time, audio_data, sample_rate), drumtrack_path = extract_drums(file_path)
     bass_drum_freq, snare_freq = identify_bass_and_snare_frequencies(
         audio_data,
         sample_rate,
         bass_drum_range,
         snare_range,
         # TODO: remove this when not debugging
-        debug_song_name=file_path.stem,
+        # debug_song_name=file_path.stem,
     )
     print(
         f"Estimated frequencies -- Bass drum: {bass_drum_freq} Hz; Snare drum: {snare_freq} Hz"
@@ -205,7 +230,14 @@ def process_song(
         peak_detection_band_width,
         peak_detection_min_area_threshold,
     )
-    blastbeat_intervals = identify_blastbeat_intervals(labeled_sections)
+
+    blastbeat_intervals = list(
+        set(
+            identify_hammer_blast(labeled_sections)
+            # TODO: improve detection, then bring this back
+            # + identify_traditional_blast(labeled_sections)
+        )
+    )
 
     print("Exporting result...")
     save_result(
@@ -250,3 +282,4 @@ if __name__ == "__main__":
 # - improve blast beat detection algorithm (support bomb blasts, slow blasts etc.)
 # - investigate false positives in benighted song & calicuchima
 # - come up with f-score??
+# - for easier debugging, color blastbeats differently by type
