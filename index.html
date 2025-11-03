@@ -9,14 +9,15 @@
     <script src="https://unpkg.com/wavesurfer.js@7/dist/plugins/spectrogram.min.js"></script>
     <style>
         body { font-family: sans-serif; margin: 20px; }
-        #controls { margin-top: 10px;  margin-bottom: 10px; display: none; padding-left: 0px; }
+        #controls { margin-top: 10px; margin-bottom: 10px; display: none; padding-left: 0px; }
         #zipInput { margin-right: 10px; }
-        #waveform { width: 100%; height: 150px; margin-top: 10px; margin-bottom: 10px;}
-        #spectrogram { width: 100%; height: 150px; margin-top: 10px; margin-bottom: 15px;}
-        #track-info { margin-top: 10px; font-style: italic; color: #444; font-size: 0.9em;}
-        #currentTime { margin-top: 5px; font-family:monospace; font-size: 2em;}
+        #waveform, #spectrogram { width: 100%; height: 150px; margin-top: 10px; margin-bottom: 10px; }
+        #track-info { margin-top: 10px; font-style: italic; color: #444; font-size: 0.9em; }
+        #currentTime { margin-top: 5px; font-family: monospace; font-size: 2em; }
         .radio-group { margin-top: 10px; margin-bottom: 10px; }
-        .load-control { margin-top: 5px; margin-bottom: 15px;}
+        .load-control { margin-top: 5px; margin-bottom: 15px; }
+        #mobile-controls { display: none; margin-top: 10px; gap: 10px; justify-content: start; }
+        @media (max-width: 768px) { #mobile-controls { display: flex; } }
     </style>
 </head>
 <body>
@@ -24,9 +25,8 @@
 <h4>Blastbeat Detection Visualizer</h4>
 <div id="explainer">
     <hr>
-    <p><i><strong>Warning:</strong> This is a work in progress. This visualizer expects a ZIP file containing an audio
-        file
-        (MP3 or WAV), a JSON file with the identified blast-beat sections, and optionally a drum-only audio track.</i>
+    <p><i><strong>Warning:</strong> This is a work in progress. The visualizer expects a ZIP file containing an audio
+        file (MP3 or WAV), a JSON file with the identified blast-beat sections, and optionally a drum-only audio track.</i>
     </p>
     <p>Expected JSON structure:</p>
     <pre>
@@ -39,8 +39,7 @@
     </pre>
     <p>You can download some examples from <a
             href="https://drive.google.com/drive/folders/1YFoxrsrBo8hl0cOYkdxCsfW_bf3CX7Al?usp=drive_link"
-            target="_blank">this Google
-        Drive folder</a></p>
+            target="_blank">this Google Drive folder</a></p>
 </div>
 <div class="load-control">
     <input type="file" id="zipInput" accept=".zip">
@@ -56,8 +55,13 @@
 </div>
 <div id="controls">
     <div id="currentTime">0:00:000</div>
+    <div id="mobile-controls">
+        <button id="playPauseBtn">Play/Pause</button>
+        <button id="zoomInBtn">Zoom In</button>
+        <button id="zoomOutBtn">Zoom Out</button>
+    </div>
 </div>
-<div id="waveform"></div>
+<div id="waveform" title="Space bar: play/pause -- Mouse wheel: zoom in/out"></div>
 <div id="spectrogram"></div>
 <script>
     let wavesurfer = null
@@ -66,115 +70,127 @@
     let zoomLevel = 0
 
     function applyZoom() {
-      if (wavesurfer) wavesurfer.zoom(zoomLevel)
+        if (wavesurfer) wavesurfer.zoom(zoomLevel)
     }
 
     function handleWheelZoom(e) {
-      if (!wavesurfer) return
-      e.preventDefault()
-      zoomLevel += e.deltaY < 0 ? 10 : -10
-      zoomLevel = Math.max(0, Math.min(zoomLevel, 200))
-      applyZoom()
+        if (!wavesurfer) return
+        e.preventDefault()
+        zoomLevel += e.deltaY < 0 ? 10 : -10
+        zoomLevel = Math.max(0, Math.min(zoomLevel, 200))
+        applyZoom()
     }
 
     function initWaveSurfer(audioFile, intervals) {
-      if (wavesurfer) {
-        wavesurfer.destroy()
-        document.getElementById('waveform').innerHTML = ""
-        document.getElementById('spectrogram').innerHTML = ""
-        document.getElementById('currentTime').textContent = "0:00:000"
-      }
-      const regions = WaveSurfer.Regions.create()
-      const spectrogram = WaveSurfer.Spectrogram.create({
-        container: '#spectrogram',
-        labels: true,
-        frequencyMax: 500,
-        scale: "mel",
-        rangeDB: 60,
-        gainDB: 20,
-        windowFunc: 'hann',
-        colorMap:  'roseus',
-        fftSamples: 256
-      })
-      wavesurfer = WaveSurfer.create({
-        container: '#waveform',
-        waveColor: '#000',
-        progressColor: '#888',
-        cursorColor: '#f00',
-        height: 150,
-        plugins: [regions, spectrogram]
-      })
-      wavesurfer.load(audioFile)
-      wavesurfer.on('ready', () => {
-        document.getElementById('explainer').style.display = 'none'
-        audioReady = true
-        document.getElementById('controls').style.display = 'block'
-        intervals.forEach(({ start_time, end_time }) => {
-          regions.addRegion({
-            start: start_time,
-            end: end_time,
-            color: 'rgba(2,247,7,0.3)',
-            drag: false,
-            resize: false
-          })
+        if (wavesurfer) {
+            wavesurfer.destroy()
+            document.getElementById('waveform').innerHTML = ""
+            document.getElementById('spectrogram').innerHTML = ""
+            document.getElementById('currentTime').textContent = "0:00:000"
+        }
+        const regions = WaveSurfer.Regions.create()
+        const spectrogram = WaveSurfer.Spectrogram.create({
+            container: '#spectrogram',
+            labels: true,
+            frequencyMax: 500,
+            scale: "mel",
+            rangeDB: 60,
+            gainDB: 20,
+            windowFunc: 'hann',
+            colorMap: 'roseus',
+            fftSamples: 256
         })
-      })
-      wavesurfer.on('timeupdate', t => {
-        const m = Math.floor(t / 60)
-        const s = Math.floor(t % 60)
-        const ms = Math.floor((t % 1) * 1000)
-        document.getElementById('currentTime').textContent = `${m}:${s.toString().padStart(2, '0')}:${ms.toString().padStart(3, '0')}`
-      })
-      document.getElementById('waveform').addEventListener('wheel', handleWheelZoom, { passive: false })
-      document.getElementById('spectrogram').addEventListener('wheel', handleWheelZoom, { passive: false })
+        wavesurfer = WaveSurfer.create({
+            container: '#waveform',
+            waveColor: '#000',
+            progressColor: '#888',
+            cursorColor: '#f00',
+            height: 150,
+            plugins: [regions, spectrogram]
+        })
+        wavesurfer.load(audioFile)
+        wavesurfer.on('ready', () => {
+            document.getElementById('explainer').style.display = 'none'
+            audioReady = true
+            document.getElementById('controls').style.display = 'block'
+            intervals.forEach(({ start_time, end_time }) => {
+                regions.addRegion({
+                    start: start_time,
+                    end: end_time,
+                    color: 'rgba(2,247,7,0.3)',
+                    drag: false,
+                    resize: false
+                })
+            })
+        })
+        wavesurfer.on('timeupdate', t => {
+            const m = Math.floor(t / 60)
+            const s = Math.floor(t % 60)
+            const ms = Math.floor((t % 1) * 1000)
+            document.getElementById('currentTime').textContent = `${m}:${s.toString().padStart(2, '0')}:${ms.toString().padStart(3, '0')}`
+        })
+        document.getElementById('waveform').addEventListener('wheel', handleWheelZoom, { passive: false })
+        document.getElementById('spectrogram').addEventListener('wheel', handleWheelZoom, { passive: false })
     }
 
     async function loadZip(zipFile) {
-      const zip = await JSZip.loadAsync(zipFile)
-      const jsonFileName = Object.keys(zip.files).find(n => n.endsWith('.json'))
-      if (!jsonFileName) return alert("No JSON found in zip")
-      const jsonData = await zip.files[jsonFileName].async('string')
-      const config = JSON.parse(jsonData)
-      const intervals = config.blast_beats || []
-      const trackType = document.querySelector('input[name="trackType"]:checked').value
-      let audioFileName = null
-      if (trackType === "drums") {
-          audioFileName = Object.keys(zip.files).find(n => /_drums\.(mp3|wav)$/i.test(n))
-          if (!audioFileName) return alert("Drums-only file (_drums) not found in zip")
+        const zip = await JSZip.loadAsync(zipFile)
+        const jsonFileName = Object.keys(zip.files).find(n => n.endsWith('.json'))
+        if (!jsonFileName) return alert("No JSON found in zip")
+        const jsonData = await zip.files[jsonFileName].async('string')
+        const config = JSON.parse(jsonData)
+        const intervals = config.blast_beats || []
+        const trackType = document.querySelector('input[name="trackType"]:checked').value
+        let audioFileName = null
+        if (trackType === "drums") {
+            audioFileName = Object.keys(zip.files).find(n => /_drums\.(mp3|wav)$/i.test(n))
+            if (!audioFileName) return alert("Drums-only file (_drums) not found in zip")
         } else {
-          audioFileName = Object.keys(zip.files).find(n => /\.(mp3|wav)$/i.test(n) && !/_drums\./i.test(n))
+            audioFileName = Object.keys(zip.files).find(n => /\.(mp3|wav)$/i.test(n) && !/_drums\./i.test(n))
         }
-      console.log(trackType)
-      console.log("Selected audio file:", audioFileName)
-      if (!audioFileName) return alert("No audio file found in zip")
-      const audioBlob = await zip.files[audioFileName].async('blob')
-      const audioURL = URL.createObjectURL(audioBlob)
-      document.getElementById('audioPath').textContent = "Track: " + audioFileName
-      if (config.snare_frequency !== undefined)
-          document.getElementById('snareFreq').textContent = "| Snare drum freq: " + config.snare_frequency.toFixed(2) + " Hz"
-      if (config.bass_drum_frequency !== undefined)
-          document.getElementById('bassdrumFreq').textContent = "| Bass drum freq: " + config.bass_drum_frequency.toFixed(2) + " Hz"
-      initWaveSurfer(audioURL, intervals)
+        if (!audioFileName) return alert("No audio file found in zip")
+        const audioBlob = await zip.files[audioFileName].async('blob')
+        const audioURL = URL.createObjectURL(audioBlob)
+        document.getElementById('audioPath').textContent = "Track: " + audioFileName
+        if (config.snare_frequency !== undefined)
+            document.getElementById('snareFreq').textContent = "| Snare drum freq: " + config.snare_frequency.toFixed(2) + " Hz"
+        if (config.bass_drum_frequency !== undefined)
+            document.getElementById('bassdrumFreq').textContent = "| Bass drum freq: " + config.bass_drum_frequency.toFixed(2) + " Hz"
+        initWaveSurfer(audioURL, intervals)
     }
 
     document.getElementById('zipInput').addEventListener('change', e => {
-      const file = e.target.files[0]
-      if (!file) return
-      currentZipFile = file
-      loadZip(file)
+        const file = e.target.files[0]
+        if (!file) return
+        currentZipFile = file
+        loadZip(file)
     })
 
     document.querySelectorAll('input[name="trackType"]').forEach(r => {
-      r.addEventListener('change', () => {
-        if (currentZipFile) loadZip(currentZipFile)
-      })
+        r.addEventListener('change', () => {
+            if (currentZipFile) loadZip(currentZipFile)
+        })
     })
 
     document.addEventListener('keydown', e => {
-      if (e.code === 'Space' && audioReady) {
-        e.preventDefault()
-        if (wavesurfer) wavesurfer.playPause()
-      }
+        if (e.code === 'Space' && audioReady) {
+            e.preventDefault()
+            if (wavesurfer) wavesurfer.playPause()
+        }
+    })
+
+    document.getElementById('playPauseBtn').addEventListener('click', () => {
+        if (audioReady && wavesurfer) wavesurfer.playPause()
+    })
+
+    document.getElementById('zoomInBtn').addEventListener('click', () => {
+        zoomLevel = Math.min(200, zoomLevel + 10)
+        applyZoom()
+    })
+
+    document.getElementById('zoomOutBtn').addEventListener('click', () => {
+        zoomLevel = Math.max(0, zoomLevel - 10)
+        applyZoom()
     })
 </script>
 </body>
