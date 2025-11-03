@@ -5,5 +5,5 @@ venv
 *.mp3
 *.pkl
 output/*
-cache.json
+download_cache.json
 *.csv

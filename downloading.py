@@ -5,7 +5,7 @@ from pathlib import Path
 
 from yt_dlp import YoutubeDL
 
-CACHE_FILE = Path(__file__).parent / "cache.json"
+CACHE_FILE = Path(__file__).parent / "download_cache.json"
 
 
 def download_from_youtube_as_mp3(url: str) -> tuple[bool, Path | None]:
