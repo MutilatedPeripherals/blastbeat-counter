@@ -246,3 +246,4 @@ if __name__ == "__main__":
 # TODO:
 # - experiment with compression of drum track before fft?
 # - investigate false positives in all songs & tune parameters
+# - make min consecutive hits configurable
