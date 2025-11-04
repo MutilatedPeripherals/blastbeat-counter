@@ -30,20 +30,16 @@ Here is what we are currently detecting with the MVP (blast beats in red):
 
 <img width="100%" alt="Dying_Fetus___Subjected_To_A_Beating" src="https://github.com/user-attachments/assets/51f43e78-fad6-4ffc-b7aa-c7d2f46c239f" />
 
-Here is another one, from the ecuadorian band Curetaje:
+And here is another one, from the ecuadorian band Curetaje:
 
 <img width="100%" alt="CURETAJE___Arutam" src="https://github.com/user-attachments/assets/8a6c01b2-eb8a-4461-af2b-d6628d6e016b" />
 
 (Yes, in this one the end is all blast beats)
 
-## MVP Roadmap
+## Demo
 
-- [X] Identify frequencies of snare & bass drum (hihat left for next iteration); hardcoded for now
-    - snare: 300hz
-    - bass drum: 50hz
-- [X] Process the waveform (0.5s segments) and determine: 1) does it contain snare, 2) does it contain bass drum
-- [X] If at least 4 consecutive segments contain snare + bass drum, count it as a blast beat
-- [X] Plot the waveform with the blast beat segments highlighted
-- [X] Dynamically identify/estimate snare & bass frequencies & test with a few different songs & drum tuning ranges
-- [X] Improve the output for easier interpretation & validation
-- [ ] Test with other types of blast beats and see what is needed to support them
+Currently the script is not deployed as a service and must be run locally (it requires a GPU for drum-track separation in reasonable time).
+
+But you can download examples of processed songs from [here](https://drive.google.com/drive/folders/1YFoxrsrBo8hl0cOYkdxCsfW_bf3CX7Al) and try the [visualizer](https://mutilatedperipherals.github.io/blastbeat-counter/):
+
+<img width="100%" alt="image" src="https://github.com/user-attachments/assets/22f55e81-60d2-4549-bca7-bc75b09b01ff" />
