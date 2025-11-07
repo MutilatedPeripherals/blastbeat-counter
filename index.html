@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BlastViz</title>
     <script src="https://unpkg.com/jszip@3.10.1/dist/jszip.min.js"></script>
     <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
@@ -13,10 +14,11 @@
         #zipInput { margin-right: 10px; }
         #waveform, #spectrogram { width: 100%; height: 150px; margin-top: 10px; margin-bottom: 10px; }
         #track-info { margin-top: 10px; font-style: italic; color: #444; font-size: 0.9em; }
-        #currentTime { margin-top: 5px; font-family: monospace; font-size: 2em; }
+        #currentTime { margin-top: 10px; font-family: monospace; font-size: 2em; }
+        #seenCount { margin-top: 10px; margin-bottom: 10px;font-weight: bold; }
         .radio-group { margin-top: 10px; margin-bottom: 10px; }
         .load-control { margin-top: 5px; margin-bottom: 15px; }
-        #mobile-controls { display: none; margin-top: 10px; gap: 10px; justify-content: start; }
+        #mobile-controls { display: none; margin-top: 10px; margin-bottom: 15px; gap: 10px; justify-content: start; }
         @media (max-width: 768px) { #mobile-controls { display: flex; } }
         #loadingWaveform, #loadingSpectrogram { display:none; font-style:italic; color:#666; text-align: center;}
     </style>

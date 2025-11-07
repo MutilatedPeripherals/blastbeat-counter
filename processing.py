@@ -112,15 +112,22 @@ def identify_blastbeats(
 
     # Caveman approach: consider it as blast beat if a given number of consecutive labeled sections contain snare & bassdrum
     for i, section in enumerate(sections):
+        # Edited this part to improve the "counting" functionality. Otherwise a single long blast beat section was being counted as only 1.
+        if hits >= min_hits:
+            results.append((sections[blastbeat_start_idx].start_idx, section.start_idx))
+            hits = 0
+
         if section.snare_present and section.bass_drum_present:
             if hits == 0:
                 blastbeat_start_idx = i
             hits += 1
+        # else:
+        #     if hits >= min_hits:
+        #         results.append(
+        #             (sections[blastbeat_start_idx].start_idx, section.start_idx)
+        #         )
+        #     hits = 0
         else:
-            if hits >= min_hits:
-                results.append(
-                    (sections[blastbeat_start_idx].start_idx, section.start_idx)
-                )
             hits = 0
 
     return results
