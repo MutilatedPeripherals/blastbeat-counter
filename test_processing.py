@@ -15,7 +15,7 @@ def test_identify_blasts_1():
         LabeledSection(10, 11, False, False),
     ]
     expected = [(2, 10)]
-    actual = identify_blastbeats(input)
+    actual = identify_blastbeats(input, 8)
 
     assert actual == expected
 
@@ -32,6 +32,6 @@ def test_identify_blasts_2():
         LabeledSection(8, 9, True, True),
     ]
     expected = []
-    actual = identify_blastbeats(input)
+    actual = identify_blastbeats(input, 8)
 
     assert actual == expected

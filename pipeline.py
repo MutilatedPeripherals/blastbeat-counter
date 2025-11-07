@@ -18,6 +18,10 @@ def parse_range(row, start, end):
     )
 
 
+def parse_int(row, key):
+    return int(row[key]) if row.get(key) else None
+
+
 def load_rows(csv_path):
     with open(csv_path, newline="") as f:
         return [
@@ -64,6 +68,7 @@ if __name__ == "__main__":
                 "snare_range": parse_range(
                     row, "snare_drum_range_start", "snare_drum_range_end"
                 ),
+                "min_consecutive_hits": parse_int(row, "min_consecutive_hits"),
             }.items()
             if v is not None
         }

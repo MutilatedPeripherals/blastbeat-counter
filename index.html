@@ -55,6 +55,7 @@
     <span id="audioPath"></span> <span id="snareFreq"></span> <span id="bassdrumFreq"></span>
 </div>
 <div id="controls">
+    <div id="seenCount">Blastbeat count: 0</div>
     <div id="currentTime">0:00:000</div>
     <div id="mobile-controls">
         <button id="playPauseBtn">Play/Pause</button>
@@ -90,6 +91,7 @@
             document.getElementById('waveform').innerHTML = ""
             document.getElementById('spectrogram').innerHTML = ""
             document.getElementById('currentTime').textContent = "0:00:000"
+            document.getElementById('seenCount').textContent = "Blastbeat count: 0"
         }
 
         const lw = document.getElementById('loadingWaveform')
@@ -123,6 +125,8 @@
 
         wavesurfer.load(audioFile)
 
+        let seenCount = 0
+
         wavesurfer.on('ready', () => {
             lw.style.display = 'none'
             document.getElementById('explainer').style.display = 'none'
@@ -145,11 +149,17 @@
             const ms = Math.floor((t % 1) * 1000)
             document.getElementById('currentTime').textContent =
                 `${m}:${s.toString().padStart(2, '0')}:${ms.toString().padStart(3, '0')}`
+            const newCount = intervals.filter(b => t > b.start_time).length
+            if (newCount !== seenCount) {
+                seenCount = newCount
+                document.getElementById('seenCount').textContent = `Blastbeat count: ${seenCount}`
+            }
         })
 
         document.getElementById('waveform').addEventListener('wheel', handleWheelZoom, { passive: false })
         document.getElementById('spectrogram').addEventListener('wheel', handleWheelZoom, { passive: false })
     }
+
 
     async function loadZip(zipFile) {
         const zip = await JSZip.loadAsync(zipFile)

@@ -103,20 +103,24 @@ def get_sections_labeled_by_percussion_content_from_audio(
     return results
 
 
-def identify_blastbeats(sections: list[LabeledSection]) -> list[tuple[int, int]]:
-    min_hits = 8  # primitive approach: 4 snares+bass in a series at least
-    start_idx = 0
+def identify_blastbeats(
+    sections: list[LabeledSection], min_hits
+) -> list[tuple[int, int]]:
+    blastbeat_start_idx = 0
     hits = 0
     results = []
 
-    for i, s in enumerate(sections):
-        if s.snare_present and s.bass_drum_present:
+    # Caveman approach: consider it as blast beat if a given number of consecutive labeled sections contain snare & bassdrum
+    for i, section in enumerate(sections):
+        if section.snare_present and section.bass_drum_present:
             if hits == 0:
-                start_idx = i
+                blastbeat_start_idx = i
             hits += 1
         else:
             if hits >= min_hits:
-                results.append((sections[start_idx].start_idx, s.start_idx))
+                results.append(
+                    (sections[blastbeat_start_idx].start_idx, section.start_idx)
+                )
             hits = 0
 
     return results
@@ -177,6 +181,7 @@ def process_song(
     step_size_in_seconds=0.15,
     bass_drum_range=(10, 100),
     snare_range=(170, 600),
+    min_consecutive_hits=8,
 ):
     print("Separating drum track...")
     (time, audio_data, sample_rate), drumtrack_path = extract_drums(file_path)
@@ -203,7 +208,7 @@ def process_song(
         peak_detection_band_width,
         peak_detection_min_area_threshold,
     )
-    blastbeat_intervals = identify_blastbeats(labeled_sections)
+    blastbeat_intervals = identify_blastbeats(labeled_sections, min_consecutive_hits)
 
     print("Exporting result...")
     save_result(
@@ -215,7 +220,7 @@ if __name__ == "__main__":
     import argparse
     import webbrowser
 
-    OPEN_BROWSER_AFTER_PROCESSING = False
+    OPEN_BROWSER_AFTER_PROCESSING = True
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--file", type=str)
@@ -244,6 +249,5 @@ if __name__ == "__main__":
         webbrowser.open(f"file://{Path(__file__).parent.resolve()}/index.html")
 
 # TODO:
-# - experiment with compression of drum track before fft?
 # - investigate false positives in all songs & tune parameters
 # - make min consecutive hits configurable
