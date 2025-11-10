@@ -15,12 +15,20 @@
         #waveform, #spectrogram { width: 100%; height: 150px; margin-top: 10px; margin-bottom: 10px; }
         #track-info { margin-top: 10px; font-style: italic; color: #444; font-size: 0.9em; }
         #currentTime { margin-top: 10px; font-family: monospace; font-size: 2em; }
-        #seenCount { margin-top: 10px; margin-bottom: 10px;font-weight: bold; }
+        #seenCount { margin-top: 10px; margin-bottom: 10px; font-weight: bold; display: inline-block; }
         .radio-group { margin-top: 10px; margin-bottom: 10px; }
         .load-control { margin-top: 5px; margin-bottom: 15px; }
         #mobile-controls { display: none; margin-top: 10px; margin-bottom: 15px; gap: 10px; justify-content: start; }
         @media (max-width: 768px) { #mobile-controls { display: flex; } }
         #loadingWaveform, #loadingSpectrogram { display:none; font-style:italic; color:#666; text-align: center;}
+        @keyframes blastbeatFlash {
+            0% { color: green; transform: scale(1.1); }
+            75% { color: inherit; transform: scale(1.01); }
+            100% { color: inherit; transform: scale(1); }
+        }
+        .blastbeat-animate {
+            animation: blastbeatFlash 0.25s ease;
+        }
     </style>
 </head>
 <body>
@@ -70,24 +78,30 @@
 <div id="spectrogram"></div>
 <div id="loadingSpectrogram">Rendering spectrogram...</div>
 <script>
-    let wavesurfer = null
-    let audioReady = false
-    let currentZipFile = null
-    let zoomLevel = 0
+    let wavesurfer = null;
+    let audioReady = false;
+    let currentZipFile = null;
+    let zoomLevel = 0;
 
     function applyZoom() {
-        if (wavesurfer) wavesurfer.zoom(zoomLevel)
+        if (wavesurfer) {
+            wavesurfer.zoom(zoomLevel);
+        }
     }
 
     function handleWheelZoom(e) {
         if (!wavesurfer) return
-        e.preventDefault()
-        zoomLevel += e.deltaY < 0 ? 10 : -10
-        zoomLevel = Math.max(0, Math.min(zoomLevel, 200))
-        applyZoom()
+        e.preventDefault();
+        zoomLevel += e.deltaY < 0 ? 10 : -10;
+        zoomLevel = Math.max(0, Math.min(zoomLevel, 200));
+        applyZoom();
     }
 
     function initWaveSurfer(audioFile, intervals) {
+        let seenCount = 0;
+        let streak = 0;
+        let lastStreakChange = 0;
+
         if (wavesurfer) {
             wavesurfer.destroy()
             document.getElementById('waveform').innerHTML = ""
@@ -96,16 +110,17 @@
             document.getElementById('seenCount').textContent = "Blastbeat count: 0"
         }
 
-        const lw = document.getElementById('loadingWaveform')
-        const ls = document.getElementById('loadingSpectrogram')
-        lw.style.display = 'block'
-        ls.style.display = 'block'
+        const lw = document.getElementById('loadingWaveform');
+        const ls = document.getElementById('loadingSpectrogram');
+        lw.style.display = 'block';
+        ls.style.display = 'block';
 
-        const regions = WaveSurfer.Regions.create()
+        const regions = WaveSurfer.Regions.create();
+
         const spectrogram = WaveSurfer.Spectrogram.create({
             container: '#spectrogram',
             labels: true,
-            frequencyMax: 500,
+            frequencyMax: 600,
             scale: 'mel',
             rangeDB: 60,
             gainDB: 20,
@@ -113,7 +128,6 @@
             colorMap: 'roseus',
             fftSamples: 256
         })
-
         spectrogram.on('render', () => ls.style.display = 'none')
 
         wavesurfer = WaveSurfer.create({
@@ -124,10 +138,7 @@
             height: 150,
             plugins: [regions, spectrogram]
         })
-
         wavesurfer.load(audioFile)
-
-        let seenCount = 0
 
         wavesurfer.on('ready', () => {
             lw.style.display = 'none'
@@ -144,22 +155,36 @@
                 })
             )
         })
-
         wavesurfer.on('timeupdate', t => {
-            const m = Math.floor(t / 60)
-            const s = Math.floor(t % 60)
-            const ms = Math.floor((t % 1) * 1000)
+            const m = Math.floor(t / 60);
+            const s = Math.floor(t % 60);
+            const ms = Math.floor((t % 1) * 1000);
+
+            // Update time display
             document.getElementById('currentTime').textContent =
-                `${m}:${s.toString().padStart(2, '0')}:${ms.toString().padStart(3, '0')}`
-            const newCount = intervals.filter(b => t > b.start_time).length
+                `${m}:${s.toString().padStart(2, '0')}:${ms.toString().padStart(3, '0')}`;
+
+            // Update blastbeat count
+            const newCount = intervals.filter(b => t > b.start_time).length;
             if (newCount !== seenCount) {
-                seenCount = newCount
-                document.getElementById('seenCount').textContent = `Blastbeat count: ${seenCount}`
+                streak++;
+                lastStreakChange = t;
+                seenCount = newCount;
+                const countEl = document.getElementById('seenCount');
+                countEl.textContent = `Blastbeat count: ${seenCount} ${streak > 3 ? '🔥🔥🔥' : ''} ${streak > 10 ? '🥵🥵🥵' : ''}`;
+                countEl.classList.remove('blastbeat-animate');
+                void countEl.offsetWidth;
+                countEl.classList.add('blastbeat-animate');
+            }else{
+                if (t - lastStreakChange >= 4) {
+                    streak = 0;
+                    document.getElementById('seenCount').textContent = `Blastbeat count: ${seenCount}`;
+                }
             }
         })
 
-        document.getElementById('waveform').addEventListener('wheel', handleWheelZoom, { passive: false })
-        document.getElementById('spectrogram').addEventListener('wheel', handleWheelZoom, { passive: false })
+        document.getElementById('waveform').addEventListener('wheel', handleWheelZoom, { passive: false });
+        document.getElementById('spectrogram').addEventListener('wheel', handleWheelZoom, { passive: false });
     }
 
 

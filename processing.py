@@ -211,7 +211,6 @@ def process_song(
     )
     blastbeat_intervals = identify_blastbeats(labeled_sections, min_consecutive_hits)
 
-    print("Exporting result...")
     save_result(
         time, blastbeat_intervals, snare_freq, bass_drum_freq, file_path, drumtrack_path
     )
@@ -248,7 +247,3 @@ if __name__ == "__main__":
 
     if OPEN_BROWSER_AFTER_PROCESSING:
         webbrowser.open(f"file://{Path(__file__).parent.resolve()}/index.html")
-
-# TODO:
-# - investigate false positives in all songs & tune parameters
-# - make min consecutive hits configurable

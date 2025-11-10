@@ -3,9 +3,17 @@ from pathlib import Path
 from zipfile import ZipFile
 
 import numpy as np
+from pydub import AudioSegment
 
 base_dir = Path(__file__).parent.resolve()
 default_output_dir = f"{base_dir}/output"
+
+
+def compress_to_mp3(wav_path: Path, bitrate: str = "192k") -> Path:
+    mp3_path = wav_path.with_suffix(".mp3")
+    audio = AudioSegment.from_wav(wav_path)
+    audio.export(mp3_path, format="mp3", bitrate=bitrate)
+    return mp3_path
 
 
 def save_result(
@@ -28,6 +36,8 @@ def save_result(
             {"start_time": float(time[start]), "end_time": float(time[end - 1])}
         )
 
+    mp3_drumtrack_path = compress_to_mp3(drumtrack_path)
+
     zip_path = f"{output_dir}/{filepath.stem.replace(' ', '_').replace('-', '_')}.zip"
     with ZipFile(zip_path, "w") as zipf:
         zipf.writestr(
@@ -35,7 +45,7 @@ def save_result(
             json.dumps(output, indent=4),
         )
         zipf.write(filepath, arcname=filepath.name)
-        zipf.write(drumtrack_path, arcname=drumtrack_path.name)
+        zipf.write(mp3_drumtrack_path, arcname=mp3_drumtrack_path.name)
 
-    print(f"Exported zip with audio, drumtrack, and JSON to: {zip_path}")
+    print(f"Exported results to: {zip_path}")
     return zip_path
