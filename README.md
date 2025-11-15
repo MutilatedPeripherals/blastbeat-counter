@@ -38,16 +38,22 @@ And here is another one, from the ecuadorian band Curetaje:
 
 ## Demo
 
-Currently the script is not deployed as a service and must be run locally (it requires a GPU for drum-track separation
-in reasonable time).
+Currently the detector is not deployed as a service because demucs requires a GPU for drum-track separation in reasonable time, and those servers aren't free...
 
-But you can download examples of processed songs
-from [here](https://drive.google.com/drive/folders/1YFoxrsrBo8hl0cOYkdxCsfW_bf3CX7Al) and try
-the [visualizer](https://mutilatedperipherals.github.io/blastbeat-counter/):
+But you can:
+- Try this notebook to process some songs using Google's free-tier GPUs: <a target="_blank" href="https://colab.research.google.com/drive/1s3fcIpFAnJWguS2-sE6LKjWVkQlOpZK1?usp=sharing">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
+- Or just directly download examples of processed songs
+from [here](https://drive.google.com/drive/folders/1YFoxrsrBo8hl0cOYkdxCsfW_bf3CX7Al).
+
+And then upload the results to the [visualizer](https://mutilatedperipherals.github.io/blastbeat-counter/):
+
+
 
 <img width="100%" alt="image" src="https://github.com/user-attachments/assets/22f55e81-60d2-4549-bca7-bc75b09b01ff" />
 
-## Running locally
+## Local development
 
 ### Install deps
 
